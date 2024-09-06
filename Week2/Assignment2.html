@@ -360,8 +360,8 @@ display: none;
 <div id="task-pull-in-a-custom-sql-data-table-into-an-r-dataframe" class="section level2">
 <h2>Task: Pull In a Custom SQL Data Table into An R Dataframe</h2>
 <p>This is the second file of the two files that is part if this
-assignment. The first file is a SQL file that creates the custom schema
-and table for use in R Studio.</p>
+assignment. The first file is a SQL file (Assignment2.sql) that creates
+the custom schema and table for use in R Studio.</p>
 </div>
 <div id="connection-to-the-sql-server" class="section level2">
 <h2>Connection to the SQL Server</h2>
@@ -372,15 +372,20 @@ data.</p>
 <pre class="r"><code>#install.packages(&quot;RMySQL&quot;)
 library(RMySQL)</code></pre>
 <pre><code>## Loading required package: DBI</code></pre>
+<pre class="r"><code>library(readr)</code></pre>
 </div>
 <div id="step-2---establish-connection-to-mysql-database" class="section level4">
 <h4>Step 2 - Establish connection to MySQL database</h4>
-<pre class="r"><code>con &lt;- dbConnect(RMySQL::MySQL(),
+<pre class="r"><code># Read the password in from file
+pw_path &lt;- &quot;~/Documents/Github/CUNYSPS_DATA607/secrets/mysql_root_pw.txt&quot;
+password &lt;- read_file(path.expand(pw_path))
+
+con &lt;- dbConnect(RMySQL::MySQL(),
                  dbname = &quot;assignment2_movies&quot;,
                  host = &quot;127.0.0.1&quot;,
                  port = 3306,
                  user = &quot;root&quot;,
-                 password = &quot;CUNYSPS&quot;)</code></pre>
+                 password = password)</code></pre>
 </div>
 <div id="step-3---listing-tables-in-the-selected-schema-to-confirm-the-connection" class="section level4">
 <h4>Step 3 - Listing tables in the selected schema to confirm the
@@ -388,6 +393,37 @@ connection</h4>
 <pre class="r"><code>dbListTables(con)</code></pre>
 <pre><code>## [1] &quot;movies&quot;</code></pre>
 </div>
+</div>
+<div id="pulling-in-data" class="section level2">
+<h2>Pulling in Data</h2>
+<p>Now that the connection is established, pulling in the data to a
+dataframe.</p>
+<pre class="r"><code>movies_df &lt;- dbReadTable(con, &quot;movies&quot;)</code></pre>
+<pre><code>## Warning in dbSendQuery(conn, statement, ...): Decimal MySQL column 2 imported
+## as numeric</code></pre>
+<pre class="r"><code>head(movies_df)</code></pre>
+<pre><code>##             title year rating person_asked_number
+## 1      Goodfellas 1990    4.5                   1
+## 2  V for Vendetta 2005    4.0                   2
+## 3         Arrival 2016    5.0                   3
+## 4       Inception 2010    3.0                   4
+## 5       The Witch 2015    4.0                   5
+## 6 The Dark Knight 2008     NA                   6</code></pre>
+</div>
+<div id="demonstrating-working-with-missing-data" class="section level2">
+<h2>Demonstrating working with Missing Data</h2>
+<p>For the purposes of this assignment, the last movie provided does not
+have a rating. The Dark Knight has no rating, and the value in that cell
+is null. If one were to get an average of the the ratings for the movies
+listed in this database, the Null value would need to be ignored.</p>
+<pre class="r"><code># Doing it this way yields a null because of the single null value
+avg_rating &lt;- mean(movies_df$rating)
+
+#Doing it this way removed the null value from the calculation
+avg_rating &lt;- mean(movies_df$rating, na.rm = TRUE)
+
+print(avg_rating)</code></pre>
+<pre><code>## [1] 4.1</code></pre>
 </div>
 
 
