@@ -1,0 +1,49 @@
+---
+title: "Assignment2 - SQL Movies Data"
+author: "John Ferrara"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task: Pull In a Custom SQL Data Table into An R Dataframe
+
+This is the second file of the two files that is part if this assignment. The first file is a SQL file that creates the custom schema and table for use in R Studio.
+
+## Connection to the SQL Server 
+
+Connecting the the localhost SQL server in order to pull in my movies data. 
+
+#### Step 1 - Importing and installing the packages needed
+```{r sql_connect1}
+
+#install.packages("RMySQL")
+library(RMySQL)
+```
+
+#### Step 2 - Establish connection to MySQL database
+```{r sql_connect2}
+con <- dbConnect(RMySQL::MySQL(),
+                 dbname = "assignment2_movies",
+                 host = "127.0.0.1",
+                 port = 3306,
+                 user = "root",
+                 password = "CUNYSPS")
+```
+
+#### Step 3 - Listing tables in the selected schema to confirm the connection
+```{r sql_connect3}
+dbListTables(con)
+```
+
+## Pulling in Data 
+Now that the connection is established, pulling in the data to a dataframe. 
+
+```{r dataframe}
+movies_df <- dbReadTable(con, "movies")
+
+head(movies_df)
+```
