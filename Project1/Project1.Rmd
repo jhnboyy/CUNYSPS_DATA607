@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: html_document
 ---
 
-```{r setup, include=True}
+```{r setup, include=FALSE}
 library(dplyr)
 library(stringr)
 library(tidyverse)
@@ -291,12 +291,13 @@ semifinal = merge(x = player_data, y = scoring_data_lim, by = "PairNum")
 semifinal
 
 ## limiting to only the columns i need
-semifinal<- select(semifinal,PlayerName,State,TtlPts_1,pre_rating,opponentavg)
-semifinal
+final<- select(semifinal,PlayerName,State,TtlPts_1,pre_rating,opponentavg)
+final
 ```
 ### Step 11: Place into a CSv file
 ```{r}
-
+## Placing into a local CSV
+write.csv(final, "ChessPlayerData.csv")
 
 ```
 
