@@ -1,2 +1,3 @@
 # Ignore the password files
 /secrets/*.txt
+/rsconnect/
