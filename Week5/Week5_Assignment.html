@@ -11,9 +11,9 @@
 
 <meta name="author" content="John Ferrara" />
 
-<meta name="date" content="2024-09-20" />
+<meta name="date" content="2024-09-27" />
 
-<title>DATA607_Project1</title>
+<title>Week5_Data607</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -350,425 +350,221 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">DATA607_Project1</h1>
+<h1 class="title toc-ignore">Week5_Data607</h1>
 <h4 class="author">John Ferrara</h4>
-<h4 class="date">2024-09-20</h4>
+<h4 class="date">2024-09-27</h4>
 
 </div>
 
 
-<div id="project-1" class="section level2">
-<h2>Project 1</h2>
-<p>n this project, you’re given a text file with chess tournament
-results where the information has some structure. Your job is to create
-an R Markdown file that generates a .CSV file (that could for example be
-imported into a SQL database) with the following information for all of
-the players:</p>
-<p>Player’s Name, Player’s State, Total Number of Points, Player’s
-Pre-Rating, and Average Pre Chess Rating of Opponents</p>
-<p>For the first player, the information would be: Gary Hua, ON, 6.0,
-1794, 1605</p>
-<p>1605 was calculated by using the pre-tournament opponents’ ratings of
-1436, 1563, 1600, 1610, 1649, 1663, 1716, and dividing by the total
-number of games played. If you have questions about the meaning of the
-data or the results, please post them on the discussion forum. Data
-science, like chess, is a game of back and forth… The chess rating
-system (invented by a Minnesota statistician named Arpad Elo) has been
-used in many other contexts, including assessing relative strength of
-employment candidates by human resource departments. You may substitute
-another text file (or set of text files, or data scraped from web pages)
-of similar or greater complexity, and create your own assignment and
-solution. You may work in a small team. All of your code should be in an
-R markdown file (and published to rpubs.com); with your data accessible
-for the person running the script.</p>
-<div id="step-1-reading-in-the-data-from-a-local-pathway." class="section level3">
-<h3>Step 1: Reading in the data from a local pathway.</h3>
-<pre class="r"><code># Reading in the text file provided for assignment 
-path = path.expand(&quot;~/OneDrive/Desktop/CUNY_SPS_Materials/DATA607 - DATA ACQ/Project1/tornamentinfo.txt&quot;)
+<div id="reading-in-the-library" class="section level2">
+<h2>Reading in the Library</h2>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(tidyr)
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+## ✔ forcats   1.0.0     ✔ readr     2.1.5
+## ✔ ggplot2   3.5.1     ✔ stringr   1.5.1
+## ✔ lubridate 1.9.3     ✔ tibble    3.2.1
+## ✔ purrr     1.0.2</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()
+## ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div id="looking-at-the-data-in-the-dplyr-package" class="section level2">
+<h2>Looking at the data in the dplyr package</h2>
+<pre><code>##      Package LibPath                                         
+## [1,] &quot;dplyr&quot; &quot;C:/Users/johnf/AppData/Local/R/win-library/4.4&quot;
+## [2,] &quot;dplyr&quot; &quot;C:/Users/johnf/AppData/Local/R/win-library/4.4&quot;
+## [3,] &quot;dplyr&quot; &quot;C:/Users/johnf/AppData/Local/R/win-library/4.4&quot;
+## [4,] &quot;dplyr&quot; &quot;C:/Users/johnf/AppData/Local/R/win-library/4.4&quot;
+## [5,] &quot;dplyr&quot; &quot;C:/Users/johnf/AppData/Local/R/win-library/4.4&quot;
+##      Item                Title                
+## [1,] &quot;band_instruments&quot;  &quot;Band membership&quot;    
+## [2,] &quot;band_instruments2&quot; &quot;Band membership&quot;    
+## [3,] &quot;band_members&quot;      &quot;Band membership&quot;    
+## [4,] &quot;starwars&quot;          &quot;Starwars characters&quot;
+## [5,] &quot;storms&quot;            &quot;Storm tracks data&quot;</code></pre>
+</div>
+<div id="reading-in-the-created-csv-file" class="section level2">
+<h2>Reading in the created CSV file</h2>
+<pre class="r"><code>path = path.expand(&quot;~/OneDrive/Desktop/CUNY_SPS_Materials/DATA607 - DATA ACQ/Week5/flight_data.csv&quot;)
 print(path)</code></pre>
-<pre><code>## [1] &quot;C:/Users/johnf/OneDrive/Desktop/CUNY_SPS_Materials/DATA607 - DATA ACQ/Project1/tornamentinfo.txt&quot;</code></pre>
-<pre class="r"><code>### alternative is to read from git 
-# alt_text &lt;-read.table(&quot;https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Project1/tornamentinfo.txt&quot;,header = FALSE, sep = &quot;\n&quot;, dec = &quot;.&quot;)
-# alt_text
-
-## CITATION for read.table:http://www.sthda.com/english/wiki/reading-data-from-txt-csv-files-r-base-functions#google_vignette
-raw_txt &lt;- read.table(path, header = FALSE, sep = &quot;\n&quot;, dec = &quot;.&quot;)#, ...)
-#Ctation for typeof: https://swcarpentry.github.io/r-novice-inflammation/13-supp-data-structures.html
-typeof(raw_txt)</code></pre>
-<pre><code>## [1] &quot;list&quot;</code></pre>
-<pre class="r"><code>#Getting the total number of values so i can extract the needed info
-max_index &lt;- length(raw_txt[,1])
-print(max_index)</code></pre>
-<pre><code>## [1] 196</code></pre>
+<pre><code>## [1] &quot;C:/Users/johnf/OneDrive/Desktop/CUNY_SPS_Materials/DATA607 - DATA ACQ/Week5/flight_data.csv&quot;</code></pre>
+<pre class="r"><code>df = read.csv(path)
+df</code></pre>
+<pre><code>##   Airline  Status Los.Angeles Phoenix San.Diego San.Francisco Seattle
+## 1  ALASKA on time         497     221       212           503    1841
+## 2  ALASKA delayed          62      12        20           102     305
+## 3  AMWEST on time         694    4840       383           320     201
+## 4  AMWEST delayed         117     415        65           129      61</code></pre>
 </div>
-<div id="step-2-cleaning-and-restructuring-stripping-the-noise" class="section level3">
-<h3>Step 2: Cleaning and Restructuring (Stripping the Noise)</h3>
-<pre class="r"><code>#Generating the index numbers that i need to parae
-## Citation: Found the seq() command:https://r02pro.github.io/vector-patterns.html
-dash_entries = seq(from = 1, to = max_index, by = 3)
-# print(dash_entries)
+<div id="working-to-transform-the-data-in-order-to-plot-and-compare-the-delays" class="section level2">
+<h2>Working to Transform the data in order to plot and compare the
+delays</h2>
+<pre class="r"><code>## First parsing out the delayed and the ontime using filter function in dplyr
+ontime &lt;- df %&gt;% filter(Status ==&quot;on time&quot;)
+delayed &lt;- df %&gt;% filter(Status ==&quot;delayed&quot;)
 
-no_dash &lt;- raw_txt[-c(dash_entries),]
-# print(no_dash)
+## Using Tidyr  to pivot each one longways for analysis
 
-no_dash_len &lt;- length(no_dash)
-# print(no_dash_len)
+##Citation: https://tidyr.tidyverse.org/reference/pivot_longer.html
+long_ontime &lt;- pivot_longer(ontime,
+             cols = c(&quot;Los.Angeles&quot;,&quot;Phoenix&quot;,&quot;San.Diego&quot;,&quot;San.Francisco&quot;,&quot;Seattle&quot;), names_to = &quot;arrival_city&quot;, values_to =&quot;instance_count&quot;)
+long_delay &lt;- pivot_longer(delayed,
+             cols = c(&quot;Los.Angeles&quot;,&quot;Phoenix&quot;,&quot;San.Diego&quot;,&quot;San.Francisco&quot;,&quot;Seattle&quot;), names_to = &quot;arrival_city&quot;, values_to =&quot;instance_count&quot;)
 
-#Skipping the First two rows that have original raw headers
-raw_data &lt;- no_dash[3:no_dash_len]
-# print(raw_data)</code></pre>
+#Concatenatining them together for one coherent DF 
+# CITATIOn: https://dplyr.tidyverse.org/reference/bind_rows.html
+long_flights &lt;- bind_rows(long_ontime,long_delay)
+long_flights</code></pre>
+<pre><code>## # A tibble: 20 × 4
+##    Airline Status  arrival_city  instance_count
+##    &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;                  &lt;int&gt;
+##  1 ALASKA  on time Los.Angeles              497
+##  2 ALASKA  on time Phoenix                  221
+##  3 ALASKA  on time San.Diego                212
+##  4 ALASKA  on time San.Francisco            503
+##  5 ALASKA  on time Seattle                 1841
+##  6 AMWEST  on time Los.Angeles              694
+##  7 AMWEST  on time Phoenix                 4840
+##  8 AMWEST  on time San.Diego                383
+##  9 AMWEST  on time San.Francisco            320
+## 10 AMWEST  on time Seattle                  201
+## 11 ALASKA  delayed Los.Angeles               62
+## 12 ALASKA  delayed Phoenix                   12
+## 13 ALASKA  delayed San.Diego                 20
+## 14 ALASKA  delayed San.Francisco            102
+## 15 ALASKA  delayed Seattle                  305
+## 16 AMWEST  delayed Los.Angeles              117
+## 17 AMWEST  delayed Phoenix                  415
+## 18 AMWEST  delayed San.Diego                 65
+## 19 AMWEST  delayed San.Francisco            129
+## 20 AMWEST  delayed Seattle                   61</code></pre>
 </div>
-<div id="step3-cleaning-and-restructuring-the-data-restructuring" class="section level3">
-<h3>Step3: Cleaning and Restructuring the Data (Restructuring )</h3>
-<pre class="r"><code>#Hardcording the original Structure of the file into an empty df 
-data_frame = data.frame(
-  PairNum_State = character(),
-  PlayerName_USCFID_RtgPrePost = character(),
-  TtlPts = character(),
-  Round1 = character(),
-  Round2 = character(),
-  Round3 = character(),
-  Round4 = character(),
-  Round5 = character(),
-  Round6 = character(),
-  Round7 = character())
+<div id="transformation-part-2-alaska" class="section level2">
+<h2>Transformation Part 2 (Alaska)</h2>
+<pre class="r"><code>## Mean and Median for Alaska Airlines
+alaska_del &lt;- long_flights %&gt;%
+  filter(Airline==&#39;ALASKA&#39; &amp; Status==&#39;delayed&#39;) %&gt;%
+  summarize(
+    total_del_count = sum(instance_count),
+    avg_del_count = mean(instance_count),
+    med_del_count = median(instance_count)
+  ) 
 
-# Using a for loop to go item by item to parse, strip and clean. 
-## For loop Citation : https://epirhandbook.com/new_pages/iteration.html
-for (raw_row in raw_data) {
-    # Removing last pip before splitting
-    raw_row &lt;-str_sub(raw_row, end= -1)
-    split &lt;- strsplit(raw_row, &quot;\\|&quot;)
-    temp_vec &lt;-c()
-    for (s in split){
-      trimmed_s &lt;- str_trim(s, side=&quot;left&quot;)
-      trimmed_s &lt;- str_trim(trimmed_s, side=&quot;right&quot;)
-      temp_vec = c(temp_vec, trimmed_s)
-      }
-    data_frame[nrow(data_frame)+1,] &lt;- temp_vec
-}      
+alaska_del$airline = &quot;ALASKA&quot;
+  
+alaska_ot &lt;-long_flights %&gt;%
+  filter(Airline==&#39;ALASKA&#39; &amp; Status==&#39;on time&#39;)%&gt;%
+  summarize(
+    total_ot_count = sum(instance_count),
+    avg_ot_count = mean(instance_count),
+    med_ot_count = median(instance_count)
+  ) 
+alaska_ot$airline = &quot;ALASKA&quot;
 
-#Checking the dataframe results
-head(data_frame)</code></pre>
-<pre><code>##   PairNum_State PlayerName_USCFID_RtgPrePost TtlPts Round1 Round2 Round3 Round4
-## 1             1                     GARY HUA    6.0  W  39  W  21  W  18  W  14
-## 2            ON  15445895 / R: 1794   -&gt;1817    N:2      W      B      W      B
-## 3             2              DAKSHESH DARURI    6.0  W  63  W  58  L   4  W  17
-## 4            MI  14598900 / R: 1553   -&gt;1663    N:2      B      W      B      W
-## 5             3                 ADITYA BAJAJ    6.0  L   8  W  61  W  25  W  21
-## 6            MI  14959604 / R: 1384   -&gt;1640    N:2      W      B      W      B
-##   Round5 Round6 Round7
-## 1  W   7  D  12  D   4
-## 2      W      B      W
-## 3  W  16  W  20  W   7
-## 4      B      W      B
-## 5  W  11  W  13  W  12
-## 6      W      B      W</code></pre>
+alaska &lt;- merge(alaska_del, alaska_ot, by = &quot;airline&quot;)
+alaska$pct_del &lt;- (alaska$total_del_count / (alaska$total_del_count + alaska$total_ot_count))*100
+
+alaska</code></pre>
+<pre><code>##   airline total_del_count avg_del_count med_del_count total_ot_count
+## 1  ALASKA             501         100.2            62           3274
+##   avg_ot_count med_ot_count  pct_del
+## 1        654.8          497 13.27152</code></pre>
 </div>
-<div id="step-4-parsing-from-new-datafrme-primary-rows" class="section level3">
-<h3>Step 4: Parsing from new Datafrme (Primary ROws)</h3>
-<pre class="r"><code># Taking the rows that are the main ans secondary rows for each entry by index Number 
-regular_index = seq(from = 1, to = length(data_frame[,1]), by = 2)
+<div id="transformation-part-2-amwest" class="section level2">
+<h2>Transformation Part 2 (AMWEST)</h2>
+<pre class="r"><code># Mean and Median for AMWEST Airlines
+## Mean and Median for Alaska Airlines
+amwest_del &lt;- long_flights %&gt;%
+  filter(Airline==&#39;AMWEST&#39; &amp; Status==&#39;delayed&#39;) %&gt;%
+  summarize(
+    total_del_count = sum(instance_count),
+    avg_del_count = mean(instance_count),
+    med_del_count = median(instance_count)
+  ) 
 
-#Split them into 2 separate dataframes and rename the columns in both to be proper
-#Dealing with the &quot;regular&quot; or primary rows
-regular_vals&lt;-data_frame[c(regular_index),]
+amwest_del$airline = &quot;AMWEST&quot;
 
-#Rename CItation: https://www.datanovia.com/en/lessons/rename-data-frame-columns-in-r/
-regular_vals&lt;-regular_vals %&gt;%
-  rename(
-     PairNum = PairNum_State,
-     PlayerName=PlayerName_USCFID_RtgPrePost,
-     TtlPts_1=TtlPts,
-     Round1_1=Round1,
-     Round2_1=Round2,
-     Round3_1=Round3,
-     Round4_1=Round4,
-     Round5_1=Round5,
-     Round6_1=Round6,
-     Round7_1=Round7
-  )
-#Using the Regular index as join column
-regular_vals$join_col&lt;-regular_index
+amwest_ot &lt;-long_flights %&gt;%
+  filter(Airline==&#39;AMWEST&#39; &amp; Status==&#39;on time&#39;)%&gt;%
+  summarize(
+    total_ot_count = sum(instance_count),
+    avg_ot_count = mean(instance_count),
+    med_ot_count = median(instance_count)
+  ) 
+amwest_ot$airline = &quot;AMWEST&quot;
 
-#checking results
-head(regular_vals)</code></pre>
-<pre><code>##    PairNum          PlayerName TtlPts_1 Round1_1 Round2_1 Round3_1 Round4_1
-## 1        1            GARY HUA      6.0    W  39    W  21    W  18    W  14
-## 3        2     DAKSHESH DARURI      6.0    W  63    W  58    L   4    W  17
-## 5        3        ADITYA BAJAJ      6.0    L   8    W  61    W  25    W  21
-## 7        4 PATRICK H SCHILLING      5.5    W  23    D  28    W   2    W  26
-## 9        5          HANSHI ZUO      5.5    W  45    W  37    D  12    D  13
-## 11       6         HANSEN SONG      5.0    W  34    D  29    L  11    W  35
-##    Round5_1 Round6_1 Round7_1 join_col
-## 1     W   7    D  12    D   4        1
-## 3     W  16    W  20    W   7        3
-## 5     W  11    W  13    W  12        5
-## 7     D   5    W  19    D   1        7
-## 9     D   4    W  14    W  17        9
-## 11    D  10    W  27    W  21       11</code></pre>
+amwest &lt;- merge(amwest_del, amwest_ot, by = &quot;airline&quot;)
+amwest$pct_del &lt;- (amwest$total_del_count / (alaska$total_del_count + amwest$total_ot_count))*100
+
+amwest</code></pre>
+<pre><code>##   airline total_del_count avg_del_count med_del_count total_ot_count
+## 1  AMWEST             787         157.4           117           6438
+##   avg_ot_count med_ot_count  pct_del
+## 1       1287.6          383 11.34169</code></pre>
+<pre class="r"><code>#Combining both descriptive wide dfs for analysis
+ stat_table &lt;- bind_rows(alaska,amwest)
+ stat_table</code></pre>
+<pre><code>##   airline total_del_count avg_del_count med_del_count total_ot_count
+## 1  ALASKA             501         100.2            62           3274
+## 2  AMWEST             787         157.4           117           6438
+##   avg_ot_count med_ot_count  pct_del
+## 1        654.8          497 13.27152
+## 2       1287.6          383 11.34169</code></pre>
 </div>
-<div id="step-5-parsing-from-new-datafrme-secondary-rows" class="section level3">
-<h3>Step 5: Parsing from new Datafrme (Secondary ROws)</h3>
-<pre class="r"><code>## Secondary Lines that start with state vals
-state_index = seq(from = 2, to = length(data_frame[,1]), by = 2)
-
-state_vals &lt;- data_frame[c(state_index),]
-
-state_vals&lt;-state_vals %&gt;%
-  rename(
-      State=PairNum_State,
-      USCFID_RtgPrePost=PlayerName_USCFID_RtgPrePost,
-      TtlPts2=TtlPts,
-      sec_Round1=Round1,
-      Round2_2=Round2,
-      Round3_2=Round3,
-      Round4_2=Round4,
-      Round5_2=Round5,
-      Round6_2=Round6,
-      Round7_2=Round7
-    )
-state_vals$join_col &lt;- regular_index
-
-head(state_vals)</code></pre>
-<pre><code>##    State           USCFID_RtgPrePost TtlPts2 sec_Round1 Round2_2 Round3_2
-## 2     ON 15445895 / R: 1794   -&gt;1817     N:2          W        B        W
-## 4     MI 14598900 / R: 1553   -&gt;1663     N:2          B        W        B
-## 6     MI 14959604 / R: 1384   -&gt;1640     N:2          W        B        W
-## 8     MI 12616049 / R: 1716   -&gt;1744     N:2          W        B        W
-## 10    MI 14601533 / R: 1655   -&gt;1690     N:2          B        W        B
-## 12    OH 15055204 / R: 1686   -&gt;1687     N:3          W        B        W
-##    Round4_2 Round5_2 Round6_2 Round7_2 join_col
-## 2         B        W        B        W        1
-## 4         W        B        W        B        3
-## 6         B        W        B        W        5
-## 8         B        W        B        B        7
-## 10        W        B        W        B        9
-## 12        B        B        W        B       11</code></pre>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<p><strong>When all flights are considered Alaska airlines has a total
+of 13.27% of arrival delays, which is a bit more than the 11.34 percent
+arrival delays of AMWest. However, when looking at the count of delays
+by city on the second plot, the arrival delays vary widely depending on
+location. The best airline with the lesser amount of delays for arrivals
+in Los Angeles, Phoenix, and San Diego is Alaska airlines. While AMwest
+is the best airline for arrivals of the two for in Seatle. Arrival
+delays are San Francisco are more evenly distributed between the
+airlines, but AMWEST has a little more of them.</strong></p>
+<pre class="r"><code>#Plotting the main overview stats for relative percent delays performamce
+ggplot(data = stat_table, aes(x=airline, y=pct_del))+
+  geom_bar(stat = &quot;identity&quot;)</code></pre>
+<p><img role="img" src="data:image/png;base64,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ks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpTy2gSzj2LcLx2AxNyfS8F2egzGAzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINgopj6YAAAtpSURBVENTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshmakukpAspINkNTMj1FQBnJZmhKpqcIKCPZDE3J9BQBZSSboSmZniKgjGQzNCXTUwSUkWyGpmR6ioAyks3QlExPEVBGshma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" width="672" /></p>
+<pre class="r"><code>#Looking at the long df again
+head(long_flights)</code></pre>
+<pre><code>## # A tibble: 6 × 4
+##   Airline Status  arrival_city  instance_count
+##   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;                  &lt;int&gt;
+## 1 ALASKA  on time Los.Angeles              497
+## 2 ALASKA  on time Phoenix                  221
+## 3 ALASKA  on time San.Diego                212
+## 4 ALASKA  on time San.Francisco            503
+## 5 ALASKA  on time Seattle                 1841
+## 6 AMWEST  on time Los.Angeles              694</code></pre>
+<pre class="r"><code>ggplot(data = long_flights%&gt;%filter(Status==&#39;delayed&#39;),aes(x=arrival_city,y=instance_count, fill=Airline))+
+  geom_bar(stat = &quot;identity&quot;)+
+  geom_text(aes(label=instance_count),position = position_dodge(width = 0.8))</code></pre>
+<p><img role="img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAACeVBMVEUAAAAAABgAACwAADoAAE4AAGYAGxgAGywAGz0AKwAAKywAK04AK24AME0AOjoAOmYAOpAATAAATCwATG4ATIwAZpAAZrYAaywAa04Aa24Aa4wAa6gAiE4AiG4AiKgAiMQApG4ApIwApKgApMQAv4wAv6gAv8QzMzM4AAA4GwA4Gxg4Gyw4MD04ME04Q146AAA6AGY6OgA6Ojo6OmY6OpA6ZmY6ZpA6ZrY6kJA6kLY6kNtNTU1NTW5NTY5Nbm5Nbo5NbqtNjqtNjshjAABjGwBjGxhjQ01jVF5jVG1mAABmADpmOgBmOjpmOpBmZgBmZjpmZmZmZpBmkGZmkJBmkLZmkNtmtttmtv9uTU1ubk1ubm5ubo5ujo5ujqtujshuq8huq+SMGwCMMACMMBiMVF6MZV6MZW2OTU2Obk2Obm6Ojk2Ojm6Oq6uOq8iOq+SOyOSOyP+QOgCQOjqQZgCQZjqQZmaQZpCQkGaQkLaQtraQttuQ27aQ2/+rbk2rbm6rjm6rq46rq8iryOSr5P+xMACxMBixQxixQyyxQz2xZV6xZW2xdm22ZgC2Zjq2Zma2kDq2kGa2kJC2tra2ttu225C229u22/+2/7a2///Ijk3Ijm7Iq27Iq47Iq6vIyKvI5OTI5P/I///VQxjVVCzVVD3VZU3VZW3Vdl7Vdm3bkDrbkGbbtmbbtpDbtrbbttvb25Db27bb29vb2//b/9vb///kq27kq47kyI7kyKvkyMjk5Mjk5P/k/8jk///r6+v4VCz4ZT34ZU34ZV74dk34dl74dm3/tmb/yI7/25D/27b/29v/5Kv/5Mj/5OT//7b//8j//9v//+T///+hMxOtAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO29j/8dV3nnN5YwwTbYFutaLBiQQTLqJkTFBGfXV167hmzwOo2dQrCS1NRpEgTtptitaSlF9S6YJgVlQ2HDIrLt2k42QWvTgosKTdbYLOYrGWlt6fsXdX6ce+/M3DnnzufOOc9znvv9vF8v+3vn/pr5POfMW/PjzNxilxBCyEYU2gtACCFWoUAJIWRDKFBCCNkQCpQQQjaEAiWEkA2hQAkhZEMoUEII2RAKlBBCNoQCJYSQDaFACSFkQyhQQgjZEAqUEEI2hAIlhJANERLoj+RRmWlMzAdgggxQWvf2DBRotpgPwAQZQIGmhQLNFvMBmCADKNC0UKDZYj4AE2QABZoWCjRbzAdgggygQNNCgWaL+QBMkAEUaFoo0GwxH4AJMoACTQsFmi3mAzBBBlCgaaFAs8V8ACbIAAo0LRRotpgPwAQZQIGmhQLNFvMBmCADKNC0UKDZYj4AE2QABZoWCjRbzAdgggygQNNCgWaL+QBMkAEUaFoo0GwxH4AJMoACTQsFmi3mAzBBBlCgaaFAs8V8ACbIAAo0LRRotpgPwAQZQIGmhQLNFvMBmCADKNC0UKDZYj4AE2QABZoWCjRbzAdgggygQNNCgWaL+QBMkAEUaFoo0GwxH4AJMoACTQsFmi3mAzBBBlCgaaFAs8V8ACbIAAo0LRRotpgPwAQZQIGmhQLNFvMBmCADKNC0UKDZYj4AE2QABZoWCjRbzAdgggygQNNCgWaL+QBMkAEUaFoo0GwxH4AJMoACTQsFmi3mAzBBBlCgaaFAs8V8ACbIAAo0LRRotpgPwAQZQIGmhQLNFvMBmCADKNC0UKDZYj4AE2QABZoWCjRbzAdgggygQNNCgWaL+QBMkAEUaFoo0GwxH4AJMoACTQsFGoGf2kKsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCGgbEUSsLtSPPhRoWijQCAgL8Jli31daky8dfdP84YvFnF8MfF6sLtSPPhRoWijQCKRz5RAvHe0I9OXfLRYCfYYCjQsTbDjTPQMFGoGEtlylFGZboNXkQqBPUqBxYYINZ7pnoEAjkNKXK1SSXAr0xx8qlgJtb4wGEKsL9aMPBZoWCjQCaUw5zIvFG/6rhUBf/qOjRUugP/lg8eERXyFWF+pHHwo0LRRoBFLJcoCffPCqTzw5F2i1+37VHyw3O18srvrEiO8Qqwv1ow8FmhYKNALJdLlCqcwP/7Qt0Pd+u7Xf3js970OsLtSPPhRoWijQCCTz5QrPVLJcCvSPv9w58Plk8Ya//lK5U/8LXw5+iVhdqB99KNC0UKARSGzNJS8drdT5pGcYU/no9UfXn4SnQMfDBBvOdM9AgUbgNiEOF8U7yz8Hite1njxyTXHT4uUFbwt8jVhdqB99KNC0UKARSOjMDgcaL/oEeqgorntH+ffWNxedd/QRqwv1ow8FmhYKNALJjNnlluKN9V+fQJccaDZVPYjVhfrRhwJNCwUagdimHOZQse/dTo/rBFruzK88t0SsLtSPPhRoWijQCMRW5TAHizYLQQ4JdOi5JWJ1oX70oUDTQoFGII0w+1Cg8jDBhjPdM1CgEUgjzD5rBbrctT8UPA0vVhfqRx8KNC0UaAQSWnMI3zHQg3Ntlk+5w6WDiNWF+tGHAk0LBRqBdK4cJDQO9KZSnLdeU7jz9cOI1YX60YcCTQsFGoGUthzAexZ+uZMf2gClQMfDBBvOdM9AgUYgoSyH8A9jOjjGnxToeJhgw5nuGSjQCCRT5TCBcaDVRUjFtW8Nf16sLtSPPhRoWijQCKTxZDLE6kL96EOBpoUCjYC2EUHE6kL96EOBpoUCjYC2EUHE6kL96EOBpoUCjYC2EUHE6kL96EOBpoUCjYC2EUHE6kL96EOBpoUCjYC2EUHE6kL96EOBpoUCjYC2EUHE6kL96EOBpoUCjYC2EUHE6kL96EOBpoUCjYC2EUHE6kL96EOBpmVjgV48cc8L9YMrT5yYzR5+and1ooVKI4rNStuIIGJ1oX70oUDTsqlAr5yaNQJ97eSs4q6nVybaqDSi2Ky0jQgiVhfqRx8KNC2bCvTczAn0zOyep3YvOZ12JtqoNKLYrLSNCCJWF+pHHwo0LRsK9OIJJ9CLJ+rNzddOHv9ib6KDSiOKzUrbiCBidaF+9KFA07KZQMsd+H/SHAM9N7u3fubc7JHeRAeVRhSblbYRQcTqQv3oQ4GmZTOBnpnd604inZk9Wj9zvnJnZ6KDSiOKzUrbiCBidaF+9KFA07KRQM+Xu++NQK+ccnvr1WRnonnnexxxFjZXtI0Iol0uQraGTQRaH+OkQJdoGxFEu1yEbA2bCPRMdYhzRaB3Pd2Z6H5EZTdCbFbaRgQRqwt3gPXhLnxaNhDoufr8+7gt0DkqjSg2K20jgojVhfrRhwJNCy7QiydqTVKgS7SNCCJWF+pHHwo0LbhAz80WlDvqPAv/IwrUB/WjDwWalqkCnQ/5dONAWxMdVBpRbFbaRgQRqwv1ow8FmpapNxPhlUg/okB9UD/6UKBpmSrQK6dmdy8uf+9MdFBpRLFZaRsRRKwu1I8+FGhaJt/O7lL7BkyXeDcmA4jVhfrRhwJNy/T7gV56olTmw26TszPRQqURxWalbUQQsbpQP/pQoGnhHekjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD/6UKBpoUAjoG1EELG6UD8AP7VFMIuMVLKAAo2AthFBxOpCgQJoGxEkmEVGKllAgUZA24ggYnWhQAG0jQgSzCIjlSygQCOgbUQQsbpQoADaRgQJZpGRShZQoBHQNiKIWF0oUABtI4IEs8hIJQso0AhoGxFErC4UKIC2EUGCWWSkkgUUaAS0jQgiVhcKFEDbiCDBLDJSyQIKNALaRgQRqwsFCqBtRJBgFhmpZAEFGgFtI4KI1YUCBdA2Ikgwi4xUsoACjYC2EUHE6kKBAmgbESSYRUYqWUCBRkDbiCBidaFAAbSNCBLMIiOVLKBAI6BtRBCxulCgANpGBAlmkZFKFlCgEdA2IohYXShQAG0jggSzyEglCyjQCGgbEUSsLhQogLYRQYJZZKSSBRRoBLSNCCJWFwoUQNuIIMEsMlLJAgo0AtpGBBGrCwUKoG1EkGAWGalkAQUaAW0jgojVhQIF0DYiSDCLjFSygAKNgLYRQcTqQoECaBsRJJhFRipZQIFGQNuIIGJ1oUABtI0IEswiI5UsoEAjoG1EELG6UKAA2kYECWaRkUoWUKAR0DYiiFhdKFAAbSOCBLPISCULKNAIaBsRRKwuFCiAthFBgllkpJIFFGgEtI0IIlYXChRA24ggwSwyUskCCjQC2kYEEasLBQqgbUSQYBYZqWQBBRoBbSOCiNWFAgXQNiJIMIuMVLKAAo2AthFBxOpCgQJoGxEkmEVGKllAgUZA24ggYnWhQAG0jQgSzCIjlSygQCOgbUQQsbpQoADaRgQJZpGRShZQoBHQNiKIWF0oUABtI4IEs8hIJQuEBLrdaBsRRLtcZAhtI4JolysXuAUaAW0jgojVhVugANpGBAlmkZFKFlCgEdA2IohYXShQAG0jggSzyEglCyjQCGgbEUSsLhQogLYRQYJZZKSSBRRoBLSNCCJWFwoUQNuIIMEsMlLJAgo0AtpGBBGrCwUKoG1EkGAWGalkAQUaAW0jgojVhQIF0DYiSDCLjFSygAKNgLYRQcTqQoECaBsRJJhFRipZQIFGQNuIIGJ1oUABtI0IEswiI5UsoEAjoG1EELG6UKAA2kYECWaRkUoWUKAR0DYiiFhdKFAAbSOCBLPISCULKNAIaBsRRKwuFCiAthFBgllkpJIFFGgEtI0IIlYXChRA24ggwSwyUskCCjQC2kYEEasLBQqgbUSQYBYZqWQBBRoBbSOCiNWFAgXQNiJIMIuMVLKAAo2AthFBxOpCgQJoGxEkmEVGKllAgUZA24ggYnWhQAG0jQgSzCIjlSygQCOgbUQQsbpQoADaRgQJZpGRShZQoBHQNiKIWF0oUABtI4IEs8hIJQso0AhoGxFErC4UKIC2EUGCWWSkkgUUaAS0jQgiVhcKFEDbiCDBLDJSyQIKNALaRgQRqwsFCqBtRJBgFhmpZAEFGgFtI4KI1YUCBdA2Ikgwi4xUsoACjYC2EUHE6kKBAmgbESSYRUYqWUCBRkDbiCBidaFAAbSNCBLMIiOVLKBAI6BtRBCxulCgANpGBAlmkZFKFlCgEdA2IohYXShQAG0jggSzyEglCyjQCGgbEUSsLhQogLYRQYJZZKSSBRRoBLSNCCJWFwoUQNuIIMEsMlLJAgo0AtpGBBGrCwUKoG1EkGAWGalkAQUaAW0jgojVhQIF0DYiSDCLjFSygAKNgLYRQcTqQoECaBsRJJhFRipZQIFGQNuIIGJ1oUABtI0IEswiI5UsoEAjoG1EELG6UKAA2kYECWaRkUoWUKAR0DYiiFhdKFAAbSOCBLPISCULKNAIaBsRRKwuFCiAthFBgllkpJIFFGgEtI0IIlYXChRA24ggwSwyUskCCjQC2kYEEasLBQqgbUSQYBYZqWQBBRoBbSOCiNWFAgXQNiJIMIuMVLKAAo2AthFBxOpCgQJoGxEkmEVGKllAgUZA24ggYnWhQAG0jQgSzCIjlSygQCOgbUQQsbpQoADaRgQJZpGRShZQoBHQNiKIWF0oUABtI4IEs8hIJQso0AhoGxFErC4UKIC2EUGCWWSkkgUUaAS0jQgiVhcKFEDbiCDBLDJSyQIKNALaRgQRqwsFCqBtRJBgFhmpZAEFGgFtI4KI1YUCBdA2Ikgwi4xUsoACjYC2EUHE6kKBAmgbESSYRUYqWUCBRkDbiCBidaFAAbSNCBLMIiOVLKBAI6BtRBCxulCgANpGBAlmkZFKFlCgEdA2IohYXShQAG0jggSzyEglCyjQCGgbEUSsLhQogLYRQYJZZKSSBRRoBLSNCCJWFwoUQNuIIMEsMlLJAgo0AtpGBBGrCwUKoG1EkGAWGalkAQUaAW0jgojVhQIF0DYiSDCLjFSygAKNgLYRQcTqQoECaBsRJJhFRipZQIFGQNuIIGJ1oUABtI0IEswiI5UsoEAjoG1EELG6UKAA2kYECWaRkUoWUKAR0DYiiFhdKFAAbSOCBLPISCULKNAIaBsRRKwuFCiAthFBgllkpJIFFGgEtI0IIlYXChRA24ggwSwyUskCCjQC2kYEEasLBQqgbUSQYBYZqWQBBRoBbSOCiNWFAgXQNiJIMIuMVLKAAo2AthFBxOpCgQJoGxEkmEVGKllAgUZA24ggYnWhQAG0jQgSzCIjlSygQCOgbUQQsbpQoADaRgQJZpGRShZQoBHQNiKIWF0oUABtI4IEs8hIJQso0AhoGxFErC4UKIC2EUGCWWSkkgUUaAS0jQgiVhcKFEDbiCDBLDJSyQIKNALaRgQRqwsFCqBtRJBgFhmpZAEFGgFtI4KI1YUCBdA2Ikgwi4xUsoACjYC2EUHE6kKBAmgbESSYRUYqWUCBRkDbiCBidaFAAbSNCBLMIiOVLKBAI6BtRBCxulCgAEFd/ZtfKYri539/Mf3yH/3HRfH6f/RtN/liMecXEzqzQzCLjFSygAKNgLYRQcTqQoEChGz1JafHNzhj/viDzfS+LzfTz1CgWlCgEdA2IohYXShQgICsln58Uz398u8WXaM+SYFqQYFGQNuIIGJ1oUAB/K76yQeLq361NOVfHC2u+kT1RCnUn/uDn/70L486YZZCfZOINVsEs8hIJQso0AhoGxFErC4UKIDfVS86b1aHOithlr7c95VqujRrvQla/v2wgDM7BLPISCULKNAIaBsRRKwuFCjACGmVoqy2NF86Ot9Tf6ZR68KwggSzyEglCyjQCGgbEUSsLhQowAhplQKtzLn0pVPpM26LVJJgFhmpZAEFGgFtI4KI1YUCBRghLWfOpS+dUZ8s3vDXXzpaFL/w5YTG7BHMIiOVLKBAI6BtRBCxulCgAGuV9e+/5M4ZPdkW6JvqY6KvPyp8Ep4CdVCgEdA2IohYXShQgDXCqoYyXdWMpH9yMR60Of3+kw8WHMakBQUaAW0jgojVhQIFWCOs//Xv/b1yK/O9lTn7An3paPFzv18+8+PfK+QOhgazyEglCyjQCGgbEUSsLhQowAhp/cXR+ix8X6BLnizExjMFs8hIJQs2EugPPzmbHf/DF5qJK0+cmM0efmpgooVQJ+w2otistI0IIlYXChRgjLVerAXZPwa6pD+dkGCWjXVkj00Eem5Wc/fT1cRrJ+uJu1Yn2gh1wm4jis1K24ggYnWhQAHGWKsR5MpZ+AWClyQFs0yUkiU2EOjFE8c/vbt76ZOze6upM7N7ntq9dGp2zwv9iTZCnbDbiGKz0jYiiFhdKFCAMdZqBNkZB/rh1ddFCGaZ7iUzbCDQM7NHqj8XT1Qbms3/y03P41/sTXQQ6oTdRhSblbYRQcTqQoEC+F3V32XvX4m0fH35SnKCWSZryQ6bn0R67WRly3PNdmj595HeRAehTthtRLFZaRsRRKwuFCiA31XPLEYnPVk/6l8Lv3i9fEHsms5glo2lYo/NBXrxRLWjfmb2aD11vnJnZ6KDUCfsNqLYrLSNCCJWFwoUwO+qapzne//qpz/98YfcMKVnmiGh87sxzV//Nx9a3jGUAhViY4H+4ERlyyun3N56pdPORPOu9zimL2jOaBsRRLtcZIiArJb3A20OeS5Hzje+XL4ud1MR7XLlwoYCPTObHf/CLgXaoG1EEO1ykSFCtpob8qpfbaZfOjp8R3rBmzJplysXNhPolf/lt0/Mjv+3HYHe9XRnovsBod2g7m6E2Ky0jQgiVhfuwgMEdfXj3zta/QbSX82ne7+JNH9dav/9p9yFn7P5MdAfVvvw67ZA5wh1wm4jis1K24ggYnWhQAHk3BeFYJaNpWKPCZdynp/1nEmB2kCsLhQogLYRQYJZNpeKOSYItNYkz8L/iAL1QYECaBsRJJhlc6mYAxfolVNOk7VA50M+3TjQ1kQHoU7YbUSxWWkbEUSsLhQogLYRQYJZJinJFhtdiXTv8i+vRPoRBeqDAgXQNiJIMMtUKxlio2vhZx9/YffKt2aVJsvt0bsXl793JjoIdcJuI4rNStuIIGJ1oUABtI0IEswSRU022OQY6PnmbkzH6z35S+0bMF3i3ZgMIFYXChRA24ggwSwTpWSJjU4iXfpUqc/5XT8vPVEq8+EXBiZaCHXCbiOKzUrbiCBidaFAAbSNCBLMsrGO7ME70kdA24ggYnWhQAG0jQgSzCIjlSygQCOgbUQQsbpQoADaRgQJZpGRShZQoBHQNiKIWF0oUABtI4IEs8hIJQso0AhoGxFErC4UKIC2EUGCWWSkkgUUaAS0jQgiVhcKFEDbiCDBLDJSyQIKNALaRgQRqwsFCqBtRJBgFhmpZAEFGgFtI4KI1YUCBdA2Ikgwi4xUsoACjYC2EUHE6kKBAmgbESSYRUYqWUCBRkDbiCBidaFAAbSNCBLMIiOVLKBAI6BtRBCxulCgANpGBAlmkZFKFlCgEdA2IohYXShQAG0jggSzyEglCyjQCGgbEUSsLhQogLYRQYJZZKSSBRRoBLSNCCJWFwoUQNuIIMEsMlLJAgo0AtpGBBGrCwUKoG1EkGAWGalkAQUaAW0jgojVhQIF0DYiSDCLjFSygAKNgLYRQcTqQoECaBsRJJhFRipZQIFGQNuIIGJ1oUABtI0IEswiI5UsoEAjoG1EELG6UKAA2kYECWaRkUoWUKAR0DYiiFhdKFAAbSOCBLPISCULKNAIaBsRRKwuFCiAthFBgllkpJIFFGgEtI0IIlYXChRA24ggwSwyUskCCjQC2kYEEasLBQqgbUSQYBYZqWQBBRoBbSOCiNWFAgXQNiJIMIuMVLKAAo2AthFBxOpCgQJoGxEkmEVGKllAgUZA24ggYnWhQAG0jQgSzCIjlSygQCOgbUQQsbpQoADaRgQJZpGRShZQoBHQNiKIWF0oUABtI4IEs8hIJQso0AhoGxFErC4UKIC2EUGCWWSkkgUUaAS0jQgiVhcKFEDbiCDBLDJSyQIKNALaRgQRqwsFCqBtRJBgFhmpZAEFGgFtI4KI1YUCBdA2Ikgwi4xUsoACjYC2EUHE6kKBAmgbESSYRUYqWUCBRkDbiCBidaFAAbSNCBLMIiOVLKBAI6BtRBCxulCgANpGBAlmkZFKFlCgEdA2IohYXShQAG0jggSzyEglCyjQCGgbEUSsLhQogLYRQYJZZKSSBRRoBLSNCCJWFwoUQNuIIMEsMlLJAgo0AtpGBBGrCwUKoG1EkGAWGalkAQUaAW0jgojVhQIF0DYiSDCLjFSygAKNgLYRQcTqQoECaBsRJJhFRipZQIFGQNuIIGJ1oUABtI0IEswiI5UsoEAjoG1EELG6UKAA2kYECWaRkUoWUKAR0DYiiFhdKFAAbSOCBLPISCULKNAIaBsRRKwuFCiAthFBgllkpJIFFGgEtI0IIlYXChRA24ggwSwyUskCCjQC2kYEEasLBQqgbUSQYBYZqWQBBRoBbSOCiNWFAgXQNiJIMIuMVLKAAo2AthFBxOpCgQJoGxEkmEVGKllAgUZA24ggYnWhQAG0jQgSzCIjlSygQCOgbUQQsbpQoADaRgQJZpGRShZQoBHQNiKIWF0oUABtI4IEs8hIJQuGBXr5M7/x/cXEhQd+6fuD7wIQ6oTdRhSblbYRQcTqQoECaBsRJJhlqi4MMSzQV++7+pvDExsi1Am7jSg2K20jgojVhQIF0DYiSDDLVF0YYoRALxyjQMNoGxFErC4UKIC2EUGCWabqwhArAn31vmKFG7kLH0TbiCBidaFAAbSNCBLMMlUXhljdAt1ZFehDk2cj1Am7jSg2K20jgojVhQIF0DYiSDDLZF/YYVWgl//5gw8+cGz/Bx6c85E/mz4boU7YbUSxWWkbEUSsLhQogLYRQYJZpgvDDCOOgcZAqBN2G1FsVtpGBBGrCwUKoG1EkGCWqO7ImxHDmGIg1Am7jSg2K20jgojVhQIF0DYiSDBLVHfkDQfSR0DbiCBidaFAAbSNCBLMIiOVLAgJ9Htznp88G6FO2G1EsVlpGxFErC4UKIC2EUGCWSb7wg4+gb7yeOssPMeBhtE2IohYXShQAG0jggSzTNWFITwC7Y4GpUDDaBsRRKwuFCiAthFBglmm6sIQHoGeLYobPvK1OV/nQPog2kYEEasLBQqgbUSQYJapujCE5yz8Y8XNUWcj1Am7jSg2K20jgojVhQIF0DYiSDBLVHfkjW8c6P7PR52NUCfsNqLYrLSNCCJWFwoUQNuIIMEsUd2RNxxIHwFtI4KI1YUCBdA2IkgwS1R35I1vF55boADaRgQRqwsFCqBtRJBglqjuyBvvSaQ7o85GqBN2G1FsVtpGBBGrCwUKoG1EkGCWqO7IG49Ay03Qj8WcjVAn7Dai2Ky0jQgiVhcKFEDbiCDBLDHVkTm+a+EfKIrlDZmmXxgv1Am7jSg2K20jgojVhQIF0DYiSDDLVF0YwncSqeBA+vFoGxFErC4UKIC2EUGCWabqwhAUaAS0jQgiVhcKFEDbiCDBLFN1YQjejSkC2kYEEasLBQqgbUSQYBYZqWQBBRoBbSOCiNWFAgXQNiJIMIuMVLKAAo2AthFBxOpCgQJoGxEkmEVGKlngEejPvtfm+cmzEeqE3UYUm5W2EUHE6kKBAmgbESSYZbIv7MCTSBHQNiKIWF0oUABtI4IEs0zVhSEo0NmkVyIAACAASURBVAhoGxFErC4UKIC2EUGCWabqwhCegfTfmd8K9H+8v9j/P/F+oGG0jQgiVhcKFEDbiCDBLFN1YYj1J5EuHLtx+i90CnXCbiOKzUrbiCBidaFAAbSNCBLMMtkXdhhxFj72jUW2D20jgmiXiwyhbUQQ7XLlwgiBxtgEFfpXvPuvoNistI0IIlYXboECaBsRJJhlqi4MMUKgMe6uLNQJu40oNittI4KI1YUCBdA2Ikgwy1RdGGLUFigFGkbbiCBidaFAAbSNCBLMMlUXhlgv0MunC+7Ch9E2IohYXShQAG0jggSz4IK4/FjR1syKc9wTMVwUF9/9QOe3An3wgWNFhJNIQp2w24his9I2IohYXShQAG0jggSz4IK4UGqm9TNC1gXaHUjPYUxr0DYiiFhdKFAAbSOCBLPggjhb3HB/66fUt0mg1380wiILdcJuI4rNStuIIGJ1oUABtI0IEswC+6Hcg7/5bOiKx/zM6eDdmCKgbUQQsbpQoADaRgQJZoH9UO7BP7RTFA9530CBikOB+hCrCwUKoG1EkGAW2A+ny63PcrfXL0kKVBwK1IdYXShQAG0jggSzoHoo3XlzdRx0cRqp8WW5Y//Qc/cXxfWf7x4DLd9+5+Wvvq99ePGVx6uzUHd8I5qxxuIX6M++enu5SLd/9PkYsxHqhN1GFJuVthFBxOpCgQJoGxEkmAXVQ7P3Xu7Hz8f7LAT6oLsbXF+gf//+5gzNDc1h07PzMza/HMNWCF6BLhYpypXwQp2w24his9I2IohYXShQAG0jggSzoHo4XZ8/Kn05309fCLTaKH3lc7srAi32/+b3d195zNmplFW18fmzP5E3qE+glT+v/8CDD7wvjkGFOmG3EcVmpW1EELG6UKAA2kYECWYB7dDswdfScaeRlgLtPNESaP28U2656XrzXFutwaQieARaLtKNzfGE0vIRlkmoE3YbUWxW2kYEEasLBQqgbUSQYBbQDnPtLUW4EOh8ZFNfoG5Ttdl0XQ6AqoZDTZYVhEegrZNeUZZJqBN2G1FsVtpGBBGrCwUKoG1EkGAWTA6LXfelMBcC7e7TLwW62OIsP9A2lPjZes+lnI+1tjp5O7t1aBsRRKwuFCiAthFBglkwOVSXcfbOuCwEOjfjyln45ulaoN3rJqff+QjCdyVSazF4O7t1aBsRRKwuFCiAthFBglkwOZxt+6/ZWKNAewh1wm4jis1K24ggYnWhQAG0jQgSzAK5oeu/ZtcXFajwgc8Wvl341lVVO7yd3Rq0jQgiVhcKFEDbiCDBLJAbdlrjfMrHtQshgbYOlcrDk0gR0DYiiFhdKFAAbSOCBLNAbjjdGuZTqrHe3YUE2voGeZf6hzHd8Gf1o+/ez2FM69A2IohYXShQAG0jggSzIGroXgJ/uhnhiQm0GnTZfEXwhiRJCA2kL26//fZIlyIJdcJuI4rNStuIIGJ1oUABtI0IEsyCqGGnI5id5jQSJtDKVjd8rnz/n0a5eTGE91LOZ+djC/Z/LMJshDphtxHFZqVtRBCxulCgANpGBAlmAcxwuXuhjpsEBbo8kS9+MNR/M5HLzz1QboF+4HNRlkioE3YbUWxW2kYEEasLBQqgbUSQYBbADMvd74az9QYpKtDdVx6vLjp//+ciuAqDt7OLgLYRQcTqQoECaBsRJJhFRipZQIFGQNuIIGJ1oUABtI0IEswiI5UsWCfQ78WZjVAn7Dai2Ky0jQgiVhcKFEDbiCDBLHGkYQKvQC9/9f3frI82RLnLs1An7Dai2Ky0jQgiVhcKFEDbiCDBLBGMYQWfQHeO1Ydn61uXRhhZJdQJu40oNittI4KI1YUCBdA2Ikgwy3RhmME/kL457fWdx49xIP06tI0IIlYXChRA24ggwSyTfWEH76WcN8z33Hkp51q0jQgiVhcKFEDbiCDBLJN9YQff3Zg69wPl3ZjCaBsRRKwuFCiAthFBglmm6sIQvJ1dBLSNCCJWFwoUQNuIIMEsU3VhCG6BRkDbiCBidaFAAbSNCBLMMlUXhvAeA7158PGmCHXCbiOKzUrbiCBidZFsd22hYJgPQIE6PALdKYo7nq8fVb+1PH0cU5qVZk0jis1K24ggYnWhQH2YD0CBOnzjQE9X92G6/fbbq3syRbhffpqVZk0jis1K24ggYnWhQH2YD0CBOnwCrW6t525n95sRZpNmpVnTiGKz0jYiiFhdKFAf5gNQoI61t7P7LG9ntxZtI4KI1YUC9WE+AAXqGH03psvf+foElaZZadY0otistI0IIlYXCtSH+QAUqGO0QKeNBk2z0qxpRLFZaRsRRKwuFKgP8wEoUAcFGgFtI4KI1YUC9WE+QDyBYs28uYISQYFGQNuIIGJ1oUB9mA9AgToo0AhoGxFErC4UqA/zASIKFJrp5gpKBAUaAW0jgojVhQL1YT4ABeqgQCOgbUQQsbpQoD7MB6BAHRRoBLSNCCJWFwrUh/kAFKiDAo2AthFBxOpCgfowH4ACdVCgEdA2IohYXShQH+YDUKAOCjQC2kYEEasLBerDfAAK1EGBRkDbiCBidaFAfZgPQIE6KNAIaBsRRKwuFKgP8wEoUAcFGgFtI4KI1YUC9WE+AAXqoEAjoG1EELG6UKA+zAegQB0UaAS0jQgiVhcK1If5ABSogwKNgLYRQcTqQoH6MB+AAnUEBXr5+dZj3lDZi7YRQcTqQoH6MB+AAnX4BfrcrxXF1d989R9/NMZveqRZadY0otistI0IIlYXCtSH+QAZCfTyY8Wd7uHKbnLrtXLiq+8riuL9n6snLhy70Ylt8bPDnTePxfujcn9S/aBcKdD7ihsm7LrPSbPSrGlEsVlpGxFErC4UqA/zATIS6IVjxdyFKwJtvVY9bqiFthDo2cXPtrffPJrAzxrf8J8fu/qbl/+7YoNvXSHNSrOmEcVmpW1EELG6UKA+zAfISKCnr/71/Z9vHq4ItPVauX154zfKv8/dX/9O+1ygS3+23zwej0B3iuJjbnGePbaYw+akWWnWNKLYrLSNCCJWFwrUh/kA+Qj01ftufLZW4u6qQNuv7cw3BF+9r9KkE2jLn+03j8cj0NPV0QC3OGfxb10hzUqzphHFZqVtRBCxulCgPswHyEegO8WdC2/2Bdp+bamxWm6NQJ9d+rPz5vEMC/TyY5Wk3dddODZlAFNDmpVmTSOKzUrbiCBidaFAfZgPkI9AT5eqOu002Bdg+7WdovNaLdCdlj87bx7PsECbBXGLM20EaEOalWZNI4rNStuIIGJ1oUB9mA+QjUCdCJvd856qeq8V+z/6fOe1+kDl4JvHQ4FGQNuIIGJ1oUB9mA+QjUDPNgcbm7M/PVV1Xtt95f7qFPz7P/t8PVX68tljReukUffNo/Htwlebsm5xcCuvkmalWdOIYrPSNiKIWF0oUB/mA+Qi0MuP1Y463Yzg7Aq0+1o5/Vyt0OKOSmfVoKb971uqrf/msXhOItVHXJvFKWXKk0hhtI0IIlYXCtSH+QC5CPTCsVpO7gBnV6Dd1xq+Ww2mr6YvVJuf5f9uDrx5DB6Blt/8y9+vF6fc8MUHR62QZqVZ04his9I2IohYXShQH+YD5CLQs8Wc6uxPV6Dd1xa8cl9zFr56djmKyfPmtfgG0lffd/ux/R+oLn7Cr29aIc1Ks6YRxWalbUQQsbpQoD7MB8hEoK/et/Dezbs9gXZfax3drI9JunGgp4v50dPOF43Hey38v51f+BTDnxRoTojVhQL1YT5AJgLdmevuwrHWwMuh15rTOu6FpUBLcdZ/e180Hv/NRH721dtLe15/xzeQr/ORZqVZ04his9I2IohYXShQH+YDZCLQxbjN5kYgHYH2Xju7OLp5upLl/FJOdxi09+bxjL4f6DTSrDRrGlFsVtpGBBGrCwXqw3yAPATaEubZakuyLdDV14r9Hyud+crjRetSTncYtP/m8VCgEdA2IohYXShQH+YD5CHQ1lXm9Umh1pHMh/qvuXGgJfsf2m0JtNzkvPqbK28ezTqBfg/4rgBpVpo1jSg2K20jgojVhQL1YT5AFgJtHddsRlu2BPqx/mvVONBfqw5KNpcjLe8HWt2x8/6VN4/FK9DLX31/fTFSEeUgaJqVZk0jis1K24ggYnWhQH2YD5CFQHPAJ9CdY0VzNafb4p1ImpVmTSOKzUrbiCBidaFAfZgPQIE6/APpm2Op33n8GAfSr0PbiCBidaFAfZgPQIE6vPcDvWG+585LOdeibUQQsbpQoD7MB6BAHb67MbW2Onk/0HVoGxFErC4UqA/zAShQR+h2dkMTG5JmpVnTiGKz0jYiiFhdKFAf5gNQoA5ugUZA24ggYnWhQH2YD0CBOrzHQG8efLwpaVaaNY0oNittI4KI1YUC9WE+AAXq8P8q5x3P149+9ifoDZ6GSLPSrGlEsVlpGxFErC4UqA/zAShQR+B34Yv9t99++7Gh+zv98FOz2fGHn2omrjxxYjYbnGiRZqVZ04his9I2IohYXShQH+YDUKAOn0Av/+n8mqj9v9l/7VuzmuNfrCZeO1lP3PX0ykSbNCvNmkYUm5W2EUHE6kKB+jAfgAJ1+K+Fv/zcA+UW6Ac+u3JrkvOz45/e3b10qvHkmdk9T1UT97zQn2iTZqVZ04his9I2IohYXShQH+YDRBQoBPLNIuB3Y7pyavZo9bfc2iz/XjxRa/S1k9X2aGeiA1alKFCgPsTqQoH6MB+AAnXgAn3tpNtDPzN7ZHf33OzeeuLcykQHrEpRoEB9iNWFAvVhPgAF6ggJ9Htznh98uRbomWZztNyvv7c30QGrUhQoUB9idaFAfZgPQIE6fAJ95fFiyeBA+npH/copt7d+8cQ9L3Qmmje9xxF/wXNC24gg2uVKgrZQMMwHGEqwGcjmhx2Btu5M6hNovb9OgVYkU10atMuVBG2hYJgPQIE6PAI9WxQ3fORrc74+8CMh5+thTC1n3vV0Z6L7bmw7PQrchfchVhfuwvswHyDiLjzUc5FvFmFYoOtvYXf+xPHqeOe6LdA5aVaaNY0oNqtkqkuDWF0oUB/mA1CgjhE3ExninBtGT4FWJFNdGsTqQoH6MB+AAnWMuJ3dAN+azUd68iz8jyhQHxSoD/MBKFCHbxc+tAV65czs7vkxzvmQTzcO9JHOk0vSrDRrGlFsVslUlwaxulCgPswHoEAd3pNId/o/c6Z1qSavRPoRBeqDAvVhPgAF6vAItNwE/ZjvI+fal7pfOTW7e3H5e2eiQ5qVZk0jis0qmerSIFYXCtSH+QAUqMOzC/+ZB4pi/wcedPxGexiTu+NSRXWk81L7BkyXeDcmA4jVhQL1YT4ABerwnUQqvAPpz886At299ET56GG3ydmZaJFmpVnTiGKzSqa6NIjVhQL1YT4ABerABboRaVaaNY0oNqtkqkuDWF0oUB/mA1CgDvxuTBuRZqVZ04his0qmujSI1YUC9WE+AAXqoEAjkEx1aRCrCwXqw3wACtRBgUYgmerSIFYXCtSH+QAZCfTyY4sxlzvXL39B4/L//sB/8s3dncU16acXP45ZPXfh2PIIZf305a++r3z4/s9Vj8+2j18GxnNWBAR6eX470Of+Mx4DDZJMdWkQqwsF6sN8gIwEWrrwRmfNnWL5E8I79bmbxTWV1Wkd59LTpRT7Al1M3/DNOAJdfz9QiDQrzZpGFJtVMtWlQawuFKgP8wEyEujpq399ft3kTnH9scUW5/XHSm8trqmsXmo8Wz914diN7bGZ5Vbsjd8o/z53/2KLdd3l7I5R9wO9kQINkkx1aRCrCwXqw3yAfAT66n03Pju33k5xw/2LLc6/XxvwrNskPV38A+fS2p09ge7MN2KXt1GaJtCz1Tj6B45V/xX+a5LGk2alWdOIYrNKpro0iNWFAvVhPkA+At0p7ly4rvTgnzph7uz/n+tnLzSbpJUY3fXp9Z+eQM+2DpW6ffZJAq22aL9f/f+h6rtvHLifMkialWZNI4rNKpnq0iBWFwrUh/kA+Qj0dLnJeHpuzeLG/9vtw5+++l/WBiw3UCt9VcJ0Lq3fvLIFumLLSQJ1G7KNsk8vjstuTpqVZk0jis0qmerSIFYXCtSH+QDZCLQ24XwPvPz7/zxWe+/V+252BjztVHazU+KrbsO0I9BX7yv2f/T5zhdPFGj94WYMwM66u9OPIM1Ks6YRxWaVTHVpEKsLBerDfIBsBFpv5M2PXFYibQ56lv9fSOyhXbczXbu02Q5tnYWvTfrK/dXD93/2+cUXxxFo9eVuI3gSaVaaNY0oNqtkqkuDWF0oUB/mA+Qi0MvNBqc7clkJq97eq552EquFeeFYc0LpzvlZpb5Ady8/Vyu0uGPuuonHQGujN7Md+U1B0qw0axpRbFbJVJcGsbpQoD7MB8hFoO64pjuGWQm01lX1tPPW5cdKQzYniar99oXaBrYKv1sNpp/LbtpZ+MbozZZxo9FppFlp1jSi2KySqS4NYnWhQH2YD5CLQJdj3qvtynqXuTpnU21mzg14dnGWqXqmdVJpaGleuS/KWfhqC/eOb7iLpE5HOA2fZqVZ04his0qmujSI1YUC9WE+QCYCbY1Xb07X1GeUbq537OcG3FkcDq08utMIsivQ1o9otkaEThFodeXo1dWVpMX+Y2uvZhpBmpVmTSOKzSqZ6tIgVhcK1If5AJkIdHGC+8KxSoG1/Urz/Ytqx35uwFfvu3l5lv7O063R9Auac0zuG+MIdPff1hdCnV4eZZ1EmpVmTSOKzSqZ6tIgVhcK1If5AJkIdDHEstlZ3mmGr+9/oHp6YcDTN/73bhvwwrH/qDnptDqQfm7L03MlTxXo7u7/Vc7h8rO33/7R6f6kQHNCrC4UqA/zAfIQaEtyZ4vFeNCzzZmgxYtn97/P7aGXmnV+HBgH+rHv17cAiXMpZ2zSrDRrGlFsVslUlwaxulCgPswHyEOgyyswq7M2DzmButszLQzYul3T4p527bsxVS8240BL9s/35acNY/pM63fkLjzwSzyJFCSZ6tIgVhcK1If5AFkItHXosnp8sxOou0HowoDtG4YWS6l2B4Jefu7XyofXLy9HijGQHvqmIGlWmjWNKDarZKpLg1hdKFAf5gNkIdAcGCFQjgNdRzLVpUGsLhSoD/MBKFDHikB7P8jZuthpCmlWmjWNKDarZKpLg1hdKFAf5gNQoI7VLdCdVYHybkxhkqkuDWJ1oUB9mA9AgTpWBXr5nz/4YHUr5QfnfOTPps8mzUqzphHFZpVMdWkQqwsF6sN8AArUMeIYaAzSrDRrGlFsVslUlwaxulCgPswHoEAdI4YxxSDNSrOmEcVmlUx1aRCrCwXqw3wACtTBgfQRSKa6NIjVhQL1YT4ABepYI9DL3/na12PMJs1Ks6YRxWaVTHVpEKsLBerDfAAK1OEV6Cv/Q3U1VHWB0w2f971nPNvd95OpLg3jrTQRCtSH+QAUqMMn0Ob2JPXNmFZ/sA5nu/t+MtWlYbyVJkKB+jAfgAJ1eAS6U2uzvgp/eY/mCWx330+mujSMt9JEKFAf5gNEFCjEZBPFxvuTHtXVRzvF4i6lE9nuvq9tRBCsy06AAvVhPgAF6gj+qNzp7m2hJrDdfV/biCBYl50ABerDfIB4AjVOaCD9q/fVt9ujQDsMBNA2Ish4K02EAvVhPgAF6ggJtL5HKQXaYyCAthFBxltpIhSoD/MBKFBHaBf+bHN7ex4D7TAQQNuIIOOtNBEK1If5ABSow3sS6ebq9Ht9s3uehe8wEEDbiCDjrTQRCtSH+QAUqMM/jKm5j93lx4vFzyxNYLv7vrYRQcZbaSIUqA/zAShQh38gffNb9dXP1U2/HSgFmhPjrTQRCtSH+QAUqMN/KednfuNz5Z9X//Ed34gwm+3u+9pGBBlvpYlQoD7MB6BAHTncjUm7L2AMBNA2Ish4K02EAvVhPgAF6qBAUQYCaBsRZLyVJkKB+jAfgAJ1hAT6vTnPT57Ndvd9bSOCjLfSRChQH+YDUKAOn0Bfebz1o3IcSN9iIIC2EUHGW2kiFKgP8wEoUIdHoN0fN6ZAWwwE0DYiyHgrTYQC9WE+AAXq8Aj0bFHc8JGvzfk6r0RaMhBA24gg4600EQrUh/kAFKjDdylnfRuReGx339c2Ish4K02EAvVhPgAF6vDdTCTC1UdttrvvaxsRZLyVJkKB+jAfgAJ15PC78Np9AWMggLYRQcZbaSIUqA/zAShQR/CGyvHY7r6vbUSQ8VaaCAXqw3wACtThPYk0/Q5Mbba772sbEWS8lSZCgfowH4ACdXgEWm6CfizmbLa772sbEWS8lSZCgfowH4ACdXh24T/zQFHs/8CDjt/gMKYlAwG0jQgy3koToUB9mA9AgTp8J5EKDqT3MBBA24gg4600EQrUh/kAFKiDAkUZCKBtRJDxVpoIBerDfAAK1MG7MaEMBNA2Ish4K02EAvVhPgAF6qBAUQYCaBsRZLyVJkKB+jAfgAJ1UKAoAwG0jQgy3koToUB9mA9AgTr6Ar38meqce/n/NjwL32IggLYRQcZbaSIUqA/zAShQR1+gr95XnTLiSSQ/AwG0jQgy3koToUB9mA9AgTooUJSBANpGBBlvpYlQoD7MB6BAHTwGijIQQNuIIOOtNBEK1If5ABSogwJFGQigbUSQ8VaaCAXqw3wACtRBgaIMBNA2Ish4K02EAvVhPgAF6qBAUQYCaBsRZLyVJkKB+jAfgAJ1UKAoAwG0jQgy3koToUB9mA9AgTooUJSBANpGBBlvpYlQoD7MB6BAHRQoykAAbSOCjLfSRChQH+YDUKAOChRlIIC2EUHGW2kiFKgP8wEoUAcFijIQQNuIIOOtNBEK1If5ABSogwJFGQigbUSQ8VaaCAXqw3wACtRBgaIMBNA2Ish4K02EAvVhPgAF6qBAUQYCaBsRZLyVJkKB+jAfgAJ1UKAoAwG0jQgy3koToUB9mA9AgTooUJSBANpGBBlvpYlQoD7MB6BAHRQoykAAbSOCjLfSRChQH+YDUKAOChRlIIC2EUHGW2kiFKgP8wEoUAcFijIQQNuIIOOtNBEK1If5ABSogwJFGQigbUSQ8VaaCAXqw3wACtRBgaIMBNA2Ish4K02EAvVhPgAF6qBAUQYCaBsRZLyVJkKB+jAfgAJ1CAk0iHZfwBgIoG1EEPEGlkC7W2CYDzCUYE/CLVCUgQDaRgQZv1k3EW6B+jAfgFugDgoUZSCAthFBxltpIhSoD/MBKFAHBYoyEEDbiCDjrTQRCtSH+QAUqIMCRRkIoG1EkPFWmggF6sN8AArUQYGiDATQNiLIeCtNhAL1YT4ABeqgQFEGAmgbEWS8lSZCgfowH4ACdVCgKAMBtI0IMt5KE6FAfZgPQIE6KFCUgQDaRgQZb6WJUKA+zAegQB0UKMpAAG0jgoy30kQoUB/mA1CgDgoUZSCAthFBxltpIhSoD/MBKFAHBYoyEEDbiCDjrTQRCtSH+QAUqIMCRRkIoG1EkPFWmggF6sN8AArUQYGiDATQNiLIeCtNhAL1YT4ABeqgQFEGAmgbEWS8lSZCgfowH4ACdVCgKAMBtI0IMt5KE6FAfZgPQIE6KFCUgQDaRgQZb6WJUKA+zAegQB0UKMpAAG0jgoy30kQoUB/mA1CgDgoUZSCAthFBxltpIhSoD/MBKFAHBYoyEEDbiCDjrTQRCtSH+QAUqIMCRRkIoG1EkPFWmggF6sN8AArUQYGiDATQNiLIeCtNhAL1YT4ABeqgQFEGAmgbEWS8lSZCgfowH4ACdVCgKAMBtI0IMt5KE6FAfZgPQIE6KFCUgQDaRgQZb6WJUKA+zAegQB0UKMpAAG0jgoy30kQoUB/mA1CgDgoUZSCAthFBxltpIhSoD/MBKFAHBYoyEEDbiCDjrTQRCtSH+QAUqIMCRRkIoG1EkPFWmggF6sN8AArUQYGiDATQNiLIeCtNZHsF+tLRNy0e/+WvHC2K1/+jv5pP//j3yumf//3g59UDTCbYGDJSyQIKFGUggLYRQcZbaSJbK9CXf7eYC/TlLxUNV324eeIvjjbTP/eVwBdoB5hOsDFkpJIFFCjKQABtI4KMt9JEtlWgpT8XAn2ymHPVJ6rpFxfTb/i2/xuUA0Qg2BgyUskCChRlIIC2EUHGW2kiWyrQH3+oWAj0paPFVb9amvIvP9Q89ZMPltueX26mf9H/FboBYhBsDBmpZAEFijIQQNuIIOOtNJGtFOjLf1TvozuBPuM2PCtz7vtKvQHabHm6aQ+aAeIQbAwZqWQBBYoyEEDbiCDjrTSRbRRotft+1R8sjoE+udhTb1S6EGql0g97v0UxQCSCjSEjlSygQFEGAmgbEWS8lSaypQJ977dbJ5EWvFircynUcufevw+vGCASwcaQkUoWUKAoAwG0jQgy3koT2UqB/vGXO2fhFzxZ77J3BLryngWKASIRbAwZqWQBBYoyEEDbiCDjrTSRbRRozYBAnS+fXBz5fLGgQPcAFCjKQABtI4KMt9JEJAUqWsEj1xQ3dZ85XBSvq/7eUrhXyrf039NiIIB2vwYJNoaMVLKAAkXRXnmnM95KE9k7Aj1c6vKd9YOiKP7Ou2+77dbyCQp0D0CBomivvNMZb6WJ7BmB3lra8m3Nw4PzcfT7VrZSWwwE0O7XIMHGkJFKFlCgKNor73TGW2kie0Wgtyz9uTDovndRoHsBChRFe+WdzngrTWSPCLRU5r53LCdvvbacvqnamX/b6icdAwG0+zVIsDFkpJIFFCiK9so7nfFWmsieEOiRA0Vx3btX33PIHRUdZCCAdr8GCTaGjFSygAJF0V55pzPeShPZEwIt/fnGofccbE7LDzMQQLtfgwQbQ0YqWUCBomivvNMZb6WJ7AWBHuyebD8033E/FDoJT4FuDRQoivbKO53xVprIHhBo35OHm+OhR6rzSv49eAp0a6BAUbRX3umMt9JE9oBADxQtKmMuhjGFNkAp0K2BAkXRXnmnM95Kal+QCgAAIABJREFUE9l+gR4u+gK97c0j/EmBbg0UKIr2yjud8VaayPYL9NCqQG97+7Xlw+veFfyCgQDa/Rok2BgyUskCChRFe+WdzngrTWRrBTqZgQDa/Rok2BgyUsmCvSfQ9g8qdqafbG9MQDfS0V4dQcZbaSIUqI+BACn7fAKCjSEjlSzYcwLt34ns5dbNxSnQuFCgPgYCJO318Qk2hoxUsmCvCbT9g4q9aQo0NhSoj4EAaft9dIKNISOVLNhjAm3/oOLQdM1PPhj6SVrzKy8Fqs9AgDQdPhnBxpCRShbsKYF2f1Bxddrx5OKHwYYwv/JSoPoMBEjU51MRbAwZqWTBXhJo7wcVV6YdLwZ/0ZsCHQ8F6mMgQKpen4hgY8hIJQv2mEA7P6g4/AOL4R14ChSAAvUxECBZt09DsDFkpJIFe0qgvR9UHP6BxfAOPAUKQIH6GAiQqtcnItgYMlLJgr0k0Br/MKaG4K/RVphfeSlQfQYCJOjrKQk2hoxUsiAHgYp23f7P2fSnDxT7Bu6O20I7wHTGW2kiFKiPgQDaRgQJNoaMVLKAAu1OH15zFwgKFIAC9TEQQNuIIMHGkJFKFlCg3emDwds4VmgHmM54K02EAvUxEEDbiCDBxpCRShZQoJ3pcmrw9xlaaAeYzngrTYQC9TEQQNuIIMHGkJFKFlCgnelDoZ9SbNAOMJ3xVpoIBepjIIC2EUGCjSEjlSygQHu/ULvmFBIFCkCB+hgIoG1EkGBjyEglCyjQzvSBtXvwFOh4KFAfAwG0jQgSbAwZqWQBBdqeXn8OngIFoEB9DATQNiJIsDFkpJIFFGh7esQhUAp0PBSoj4EA2kYECTaGjFSygAJtT9+ydhATBQpAgfoYCKBtRJBgY8hIJQso0Pb0iHNIFOh4KFAfAwG0jQgSbAwZqWQBBdoV6OvWfoF2gOmMt9JEKFAfAwG0jQgSbAwZqWTBnhPoZMwHoED1GQigbUSQYGPISCULKFAU8wEoUH0GAmgbESTYGDJSyQIKFMV8AApUn4EA2kYECTaGjFSygAJFMR+AAtVnIIC2EUGCjSEjlSygQFHMB6BA9RkIoG1EkGBjyEglCyhQFPMBKFB9BgJoGxEk2BgyUskCChTFfAAKVJ+BANpGBAk2hoxUsoACRTEfYG8K9FBruO+Rt1xTFNe+dTH99muLanrtNRTxGAigbUSQYGPISCULKFAU8wH2pEDb10vcWjS8rjHmkTe76X1rL+ONxkAAbSOCBBtDRipZQIGimA+wFwVa+nMh0OpxQ3PrwgPzyRHX8cZiIIC2EUGCjSEjlSygQFHMB9iDAr21cuZcoAeL4rp3lfvtRXPrrUOlON9R/n37NSPuZRiLgQDaRgQJNoaMVLKAAkUxH2DPCfTIW+rtS2fHcgO0ueHB4WYTdHEDmXJ6/Z0QIjEQQNuIIMHGkJFKFmwq0NdO3useXXnixGz28FMDEy027fsZYj7AXhNotcu+712LY6DLe7426lz+CMGYe3FFYiCAthFBgo2xoVQssqlAz8ycQF87Oau46+mViTYb9v0cMR9gDwr0ptZJpFsWmuzfPvsWCnQ8wcbYWEf22EygV87M5gI9M7vnqd1Lp2b3vNCfaLNh388R8wH2nED/7rvbZ+GXtyw83BPoAe7CjyfYGJOUZIuNBPrDT87mAr14ot7cfO3k8S/2Jjps2PdzxHyAvSbQmqVAD7QF2j5rdIgnkQCCjTHNSabYRKDnZrOP/8AJ9Nzi7yO9iQ5T+n5mmA+w5wX6xpXnKiTPIVGgW8NGAr37C7vnnSvPzB6t/9bTnYkOU/p+ZpgPQIGuPFdy+JoRv4cVjYEA2kYECTbGBCFZY9OTSM6RV065vfWLJ+55oTPRvO09juB3iXXbKJgPMJTAPmsyrxPorcWIH2SNx0AAbSOCiDdwplCgKOYD7HmBDhwDvUXWnxTo1hBPoHc93Znovn3K3ldmmA+wx3fhh87CH3RXI4kxEEDbiCDBxthYR/ZIvAU6Z0rfzwzzAfa4QDvjQOujnkcOFMV1grdiuo0C3R4oUBTzAfa4QPtXItV3E3mj73OJGAigbUSQYGNsrCN7TBQoz8LbC7DHBdq/Fr7afxcb/zlnIIC2EUGCjbGhVCwyVaDzIZ9uHOgjnSeXTOn7mWE+wB4X6PyAZ+tuTOL+pEC3hqkC5ZVI5gLsdYEeLjr3A13eDrSQGwk6EEDbiCDBxpggJGtMFeiVU7O7F5e/dyY6TOn7mWE+wF4XaLXNubwj/eGCAt2EYGNMUpItpgp091L7BkyXeDcmA4y30kQyFWjnN5EOUaAbEWyMjXVkj8kC3b30RKnMh18YmGgxpe9nhvkAe1KgmTEQQNuIIMHG2FAqFuEd6VHMB6BA9RkIoG1EkGBjyEglCyhQFPMBKFB9BgJoGxEk2BgyUskCChTFfAAKVJ+BANpGBAk2hoxUsoACRTEfgALVZyCAthFBgo0hI5UsoEBRzAegQPUZCKBtRJBgY8hIJQsoUBTzAShQfQYCaBsRJNgYMlLJAgoUxXwAClSfgQDaRgQJNoaMVLKAAkUxH4AC1WcggLYRQYKNISOVLKBAUcwHoED1GQigbUSQYGPISCULKFAU8wEoUH0GAmgbESTYGDJSyQIKFMV8AApUn4EA2kYECTaGjFSygAJFMR+AAtVnIIC2EUGCjSEjlSygQFHMB6BA9RkIoG1EkGBjyEglCyhQFPMBKFB9BgJoGxEk2BgyUskCChTFfAAKVJ+BANpGBAk2hoxUsoACRTEfgALVZyCAthFBgo0hI5UsoEBRzAegQPUZCKBtRJBgY8hIJQsoUBTzAShQfQYCaBsRJNgYMlLJAgoUxXwA+2vvVnYi7aKCUKANFCiK+QD2196t7ETaRQWhQBsoUBTzAeyvvVvZibSLCkKBNlCgKOYD2F97t7ITaRcVhAJtoEBRzAewv/ZuZSfSLioIBdpAgaKYD2B/7d3KTqRdVBAKtIECRTEfwP7au5WdSLuoIBRoAwWKYj6A/bV3KzuRdlFBKNAGChTFfAD7a+9WdiLtooJQoA0UKIr5APbX3q3sRNpFBaFAGyhQFPMB7K+9W9mJtIsKQoE2UKAo5gPYX3u3shNpFxWEAm2gQFHMB7C/9m5lJ9IuKggF2kCBopgPYH/t3cpOpF1UEAq0gQJFMR/A/tq7lZ1Iu6ggFGgDBYpiPoD9tXcrO5F2UUEo0AYKFMV8APtr71Z2Iu2iglCgDRQoivkA9tferexE2kUFoUAbKFAU8wHsr71b2Ym0iwpCgTZQoCjmA9hfe7eyE2kXFYQCbaBAUcwHsL/2bmUn0i4qCAXaQIGimA9gf+3dyk6kXVQQCrSBAkUxH8D+2ruVnUi7qCAUaAMFimI+gP21dys7kXZRQSjQBgoUxXwA+2vvVnYi7aKCUKANFCiK+QD2196t7ETaRQWhQBsoUBTzAeyvvVvZibSLCkKBNlCgKOYDZLL2/uWvFEXx87/vpl4s5vzi+o9uZSdKWuz4UKANFCiK+QBZrL0v/67z5Xub6WcoUFtQoA0UKIr5ADmsvQt/zoX5JAVqCwq0gQJFMR8gh7W33OC86ldLj/7R0WLfV35aC/VN4z+9lZ0oWa3TQIE2UKAo5gNksPaWvtz35frRM8VVnyj//OSDxYfHf3wrO1GaSieDAm2gQFHMB8hg7X3paM+XLzYeHclWdqLIJU4NBdpgRqBvv7Yoiuve0Zm89q3vTtbFvZhfeTNYe59pdtwDTwShQPWhQBuMCPTINe4Uw03N5Jvd5L53pu3oA5hfeTNYe58s3vDtf/+lo0Xx8//b4om/rqZ/4ctjPk6B6kOBNtgQ6MKfRfG2avrAYnKf+Dao+ZVXf+2tThm9eLR10r184vXt6TVQoHHoDsWteenoyJN5FGiDDYEeLE1Z7r0feUtRvK6cPNRM3vb2a+abpIKYX3n1E5T/Hl7b+RfxcFF0ptdAgcagPxTXPUeBQpgQaLnCva7Z0jxYb3IenG94Hm6EKor5lVc/Qb1Dcd27brvt1jcv/kWsD2/Pp9dAgUZgZSiue44ChTAh0HL96hzrPFC80T06KL8Pb37l1U9QCdS14MGVpi3WH9amQCPQH4pb8uMPFRQoiAmBHvRultxCgeKoJ6gE6jR5uHcQpj89CAU6nZWhuLVKKVAUEwKttjjf9Wa329d7hbvwMOoJqkMyy4c39V6iQCVYGYpb7b5f9Qc8BgpiQaDVSnXL4CmGQzyJtAH6CQ4sdhwoUCWBroy8LQX63m/zJBKKEYFeO3iSVuMcUgb6mYp+glsWu/CH6hZd7kgcGnMangKdzspQ3Jf/+Ms8C49jRKDdk7aOw9eMOeMQG/MrbwYJDi3asTlpdHCuzbKpRxzUpkAnszIUd/n0uC+gQBusCHTgpO2t4wYNxsb8yptDggPNSN7qX8SqZatxoDeV4rx12dIhtlKgsgvg2asbdQSlhgJtsCLQ1ZO2t+j4U7/vTyaDBK2R83XLHoQuLaNAJ+PZq6NAUYwIdPWkrbs4SR71vj+ZHBLc6i7OnbfhQcCfFOh0PHt1FCiKBYEOnLQ9Uu4DXqdwK6bbMuj7k8kiwZG3lKvwvr+zaMNqS6i49q2jPkuBTsYzFJcCRTEh0P5J2/oY2ohjZUlQ7/uTMZ+AAp2MZyguBYpiQqD9k7bVXof4+M856n1/MuYTUKDTGR6KS4GimBBo/6Stxvj5Bfp9fyrmE1Cg01ndq6ugQFFsCLR30nZ5O9BCfiSoft+fivkEFOh0VvbqaihQFBsC7Z60bd89kgLFMZ+AAo1Ab6+ugQJFMSLQzknbQxToJMwnoEAj0B+KW0OBolgRaD6YD2A/ATtRDPpDcSsoUBQKFMV8APsJ2Imi0B+KexsFikOBopgPYD8BO5E+FGgDBYpiPoD9BOxE+lCgDRQoivkA9hOwE+lDgTZQoCjmA9hPwE6kDwXaQIGimA9gPwE7kT4UaAMFimI+gP0E7ET6UKANFCiK+QD2E7AT6UOBNlCgKOYD2E/ATqQPBdogJNAg2n0Bw3wA+wnYifSZtMZvEdwCRTEfwH4CdiJ9uAXaQIGimA9gPwE7kT4UaAMFimI+gP0E7ET6UKANFCiK+QD2E7AT6UOBNlCgKOYD2E/ATqQPBdpAgaKYD2A/ATuRPhRoAwWKYj6A/QTsRPpQoA0UKIr5APYTsBPpQ4E2UKAo5gPYT8BOpA8F2kCBopgPYD8BO5E+FGgDBYpiPoD9BOxE+lCgDRQoivkA9hOwE+lDgTZQoCjmA9hPwE6kDwXaQIGimA9gPwE7kT4UaAMFimI+gP0E7ET6UKANFCiK+QD2E7AT6UOBNlCgKOYD2E/ATqQPBdpAgaKYD2A/ATuRPhRoAwWKYj6A/QTsRPpQoA0UKIr5APYTsBPpQ4E2UKAo5gPYT8BOpA8F2kCBopgPYD8BO5E+FGgDBYpiPoD9BOxE+lCgDRQoivkA9hOwE+lDgTZQoCjmA9hPwE6kDwXaQIGimA9gPwE7kT4UaAMFimI+gP0E7ET6UKANFCiK+QD2E7AT6UOBNlCgKOYD2E/ATqQPBdpAgaKYD2A/ATuRPhRoAwWKYj6A/QTsRPpQoA0UKIr5APYTsBPpQ4E2UKAo5gPYT8BOpA8F2kCBopgPYD8BO5E+FGgDBYpiPoD9BOxE+lCgDRQoivkA9hOwE+lDgTZQoCjmA9hPwE6kDwXaQIGimA9gPwE7kT4UaAMFimI+gP0E7ET6UKANFCiK+QD2E7AT6UOBNlCgKOYD2E/ATqQPBdpAgaKYD2A/ATuRPhRoAwWKYj6A/QTsRPpQoA0UKIr5APYTsBPpQ4E2UKAo5gPYT8BOpA8F2kCBopgPsGmCt19bFMW1b333fPrIW66pptMtpxd2In0o0AYKFMV8gM0SHHlz0bDvnc0Tt7rp1707/MEEsBPpQ4E2UKAo5gNsluBAMWdfbcwj18yn35h6eVdgJ9KHAm2gQFHMB9gowaFSnO8o/7699OZN1RMHi+K6d5XTpUHflnqB+7AT6UOBNlCgKOYDbJTgoNvwvO1wudN+W70B+rr5tPgmKDuRPhRoAwWKYj7ARgkOLDTZqPTQYsNzoVY52In0oUAbKFAU8wEmJrilFuYtC20ekt+HZyfShwJtoEBRzAeYmOBAve9+0O3B1/vwFCiK+QAUqIMCRTEfYFqCQ81JpANtgd6UYikDsBPpQ4E2UKAo5gNMSuDOIbWOiR65hgKFMR+AAnVQoCjmA0xJcPiaoqgH0lOgkzAfgAJ1UKAo5gNMSHDrYtQnBToJ8wEoUAcFimI+wOYJblmOmucx0EmYD0CBOihQFPMBNk5w0F2N1DzmWfgJmA9AgTooUJQpAQ61Ntb6NzeSY7MERw4UxXWLpe2MA31nogX1sbc7UR5QoA0UKMqEAK3DhSs3NxJkswQHOtds8kqkSZgPQIE6KFCUzQMcuWZ5uLB/cyNJNkpwsHuok9fCT8J8AArUQYGibBzg1uoGcE5CKzc3kmSTBIf6y+kOiPJuTBthPgAF6qBAUTYMcOQt9fams1D/5kaibJJgucVcNMc8Dy+meD9QHPMBKFAHBYqyWYBq933fuxbHQPs3NxJlgwSHi75Aq21S3pF+U8wHoEAdFCjKxgK9aXDM+S0mBHpoVaD8TaQJmA9AgTooUJQNBfp33z180c4BG7vwWbFXO1FOUKANFCjKhAADAl05OSPANjaB/QTaiwRCgTZQoChRBapxDsn+2runO1EmUKANFChKTIEubm4kyjY2gf0E2osEQoE2UKAoEQW6vLmRKNvYBPYTaC8SCAXaQIGixBPoLTr+tL/27ulOlAkUaAMFihJNoO2bG4myjU1gP4H2IoFQoA0UKEokgXZvbiTKNjaB/QTaiwRCgTZQoCiRBHpA4xrIhm1sAvsJtBcJhAJtoEBR4gj0oML4zznb2AT2E2gvEggF2kCBokQRqMb4+QXb2AT2E2gvEggF2kCBokQR6MrNjSTZxiawn0B7kUAo0AYKFCWGQAdubiTINjaB/QTaiwRCgTZQoCgxBDp0cyM5trEJ7CfQXiQQCrSBAkUxH8B+AnYifSjQBgoUxXwA+wnYifShQBsoUBTzAewnYCfShwJtiCzQK0+cmM0efmrleQo0I8wnYCfShwJtiCvQ107OKu56uv8CBZoR5hOwE+lDgTbEFeiZ2T1P7V46Nbvnhd4LFGhGmE/ATqQPBdoQVaAXT9Tbnq+dPP7F3isUaEaYT8BOpA8F2hBVoOdm97q/j/ReoUAzwnwCdiJ9KNCGqAI9M3u0/nveiXQJBZoR5hOwE+lDgTbEFOiVU27X/eKJ+UHQ9ziCn9PuCxjmA9hPwE6kT3CN3kPkIFBCCDFJIoH2BzIFN/jToDLTmJgPwAQZoLTu7RkSb4HOUWlEhZnGxHwAJsgACjQtFGi2mA/ABBlAgaYlh7PwqRpRYaYxMR+ACTKAAk1L5HGgj3T+LlFpRIWZxsR8ACbIAAo0LTlciZSqERVmGhPzAZggAyjQtEQV6JVTs7s3uBY+VSMqzDQm5gMwQQZQoGmJezORSxvdjSlVIyrMNCbmAzBBBlCgaYl8P9BLT5T+fLi//UmBboL5AEyQARRoWnK4I32qRlSYaUzMB2CCDKBA00KBZov5AEyQARRoWijQbDEfgAkygAJNCwWaLeYDMEEGUKBpoUCzxXwAJsgACjQtFGi2mA/ABBlAgaaFAs0W8wGYIAMo0LRQoNliPgATZAAFmhYKNFvMB2CCDKBA00KBZov5AEyQARRoWijQbDEfgAkygAJNCwWaLeYDMEEGUKBpoUCzxXwAJsgACjQtFGi2mA/ABBlAgaaFAs0W8wGYIAMo0LRQoNliPgATZAAFmhYKNFvMB2CCDKBA00KBZov5AEyQARRoWijQbDEfgAkygAJNCwWaLeYDMEEGUKBpoUCzxXwAJsgACjQtFGi2mA/ABBlAgaaFAs0W8wGYIAMo0LRQoNliPgATZAAFmhYKNFvMB2CCDKBA00KBZov5AEyQARRoWijQbDEfgAkygAJNCwWaLeYDMEEGUKBpoUCzxXwAJsgACjQtQgJV4D3v0V6CiZgPwAQZYD9B3lCg2WI+ABNkgP0EeUOBZov5AEyQAfYT5A0Fmi3mAzBBBthPkDcUaLaYD8AEGWA/Qd5QoNliPgATZID9BHlDgWaL+QBMkAH2E+QNBZot5gMwQQbYT5A32ytQQghJDAVKCCEbQoESQsiGUKCEELIhFCghhGwIBUoIIRtCgRJCyIZQoIQQsiFZC/S1k3c9jbz/yqnZIwm/PhYXT8wa/uEfvlBOnoEWuuIc/IkoXPlXv1Uu9O98Ycx7XzvpMv72H/5t/YT0MiMLu2iQ2QztEUpN0WJk0Cv/6uPz/2v1+61kqwRargj3vJDu62PRWl+rxbUi0MVi3z2iaguBzmbHP109IbzM0MJaFujYoOdn987/T4FGZKsEeuau//r4F9N9fSwunnCa/+GJavXDBapCuXl/z1Pl3x9+sl4V17Co7d88MZs9mnbJBsAW9uIJs0YZHZQCTcM2CfS1k/f8YMz6suHXR2Mh0LI/l0tgRKDn51v3r50c8a9Uq7bn4M266WALa1igo4NSoGmwJNBL5cbM7OGnmsefqo6vfbrz9vOzRxafODN79Ae/NX/3lW+VezhPub2tS0+UOz2/89Ty65dPDH9tdJYCrZegFOjFT5aL+sJKyPaitQNVSdyaI7fun1v82+SM/8NPtQ7jtqq9TNZQbiQ9utjXbRe71yyzzhdILmy3iGU3+sGJ2d1fDHyo3N6b/cPWkYlOt1m+GDvVmKDtAi8DlG1Q8p/W/793oN+TTTEk0PPN0Z7j1Q7h/MhPZ3vzTPlv8Bm3v3hm9tuLY1pN7zn+39Q97OLyW5qvv7jua6OzItD/4sT8eGgnZGfR2oHOLfb8GzmJcL63Ifmt2bJW7YVrJXPUK/m5fvW7zdLJLb2wfYFW7VG2hvdD55rnH9l1sTrdpvVi7FQjgrYL3AowINCLyZdtT2BHoGWDP/y31VZLqcmyP/yXL1THENu7LbWX5rs0Z8qO8sJuuSVRb/wc/8LupU/Wnfq1k7OPl/8g/3nV7+qvbz8x+LXxae/Cl4/KRb3nKbeo7ZCdResFqtfa8j3noLNmkyiX5rg7o94s+vHqxO8P6iVtL9z83W0/lQt5rl/9TrN0cosvbF+g7t8y34fKhS27yQ8W/5Z1uk37xdip1gftFLgToL8L33kn2Rg7Ap3vrJwp/w4e8HGraPPKmWYlONP0b7d1+cjyW6o311/ffSKtOR1zgV75gTuJtFjUTsjOovXe1Wz83Cu0wA2V68p9vn/2t24J622sprjthWvoCrSuc6/6g81yJtbGP7Swy7PwjWTmXcjzIbewZ+b/lnVaofti5FRrg/a6TCtAX6Cdd5KNMSPQxc5qtdVWTtz9r3tvvnKqfrPrNWfm+1P3LnzVyNT19erJ6us7Twx9bQJWhjEtFrUXsrVo7Xe5Tl+++bdEe/+VH9Yr6/xo7e7uf/j//uknZ41elgvXMCjQTqJus7Ryyy9sX6DLZRj6UOewifunYNFt2i8mSDVAO2i3y3QC9AS6+k6yEWYEuvhn3v37WXL3P2s3/cUTdRd3B4WcR6sOf7672TPnrqebjtR6YuhrE7BYX5vRz61F7YTsLlrrXfOtBnDYaxT+phq23ZyD+KRbuEc7ERwegbYStZul27jiC9vfhXdV9Xyot8H5yG6727RfTJRqgHnQbpfpBFgRaOedZFMMCdQ9bh5Up0RLPr4UyLlFj2jOuQwKtDW+uxFo54mhr01A7x/9zrrZCtldtAGBlm9Ie7ZrmEsn5ydOjv/OP/nXp9YLtDbSSvW7zdJpXOmF7Qv0Xvfs8Id6B5aq55fdJtBl01IH7XaZToCeQHv9nmyKIYH2/jm/8n9UYzRaB90WPaI5a9oSaOOrlcNVTUfqHUXsfW0KQgJthewu2oBAz80Ex6i3lsYdRLm3CnFlhEAXy9xJNNgskVQDLuygQL0fWt0C3V12G+Et0F7QzqJ1A6wIVPDo+TZjRqBDB5Su/Pny8Xy7oTk73e7wgwfb5l8/NA6o/bUp8Au0f6D30cF3LYYE3fV/yh3Aai1Ne1Ut/91aJ9DmLef61U95DBRc2EGBej+0cgx0PtM/7zWawDHQXtBe924HWN2F5/ilGJgRaOeU5rzHt1Q0HwDq7iiy2uFfO9kcrmo+0axX9bG55RMDX5sCv0D7Z+GXi7Yq0DqW4FVMywuK2uMgzs961Xa0mu5bdYxz/er3miXu+WpsYYMCXf3Qud75vE636b6Y/Cx8N2ive7cDrJ6Fb3UusjF2BNoMqvsPT7hxoNUVwJdOLXpm59LBFd+UH1mOA60+WQ/om4+HWzyx+rVJCAi0HbKzaKsCrXu+4J5YNeLw0y/UF9c0LXBvPYxwjUCv/M2nmlFB5/rV7zRLJ7f4wgZ24Yc+1Az1/OGJ1ob1stu0X4ydam3Qfm9uBWhE6TpNr9+TzclcoO0TQ0NXIt399GJEeXtQyqOdDj90yctscVuv1hOdr01HQKDda1fai9YXqFOn4Ej6xTndeuHON4/v+fNqgbp6cWvyrP12t6/bTpTySiRsYYdPInk/ND9fee88VqfbtF4UuBKpF7RT4E6Ai/XVVfX//91KvycbY0ig3Wvhqwt5m8uUq5Wgd+jp3m6Hby667lws/IXd3rXwX+h/bTpCAh26Fr4/2KleazujpGW44i6tbsZsu0u+V44v9AT6266Y5/rVX2mWWdSrxpGFHRao90MD18K3u43otfD9oJ0CtwPs/r/1oLfq//9utd+TTclaoHE5w52VHGGzEMPsAYG67QsO3MgLNgvZAvaAQKvx5i/sXjnD041ZwWYhW8AeEOjuD9xRdm7pZAWbhdhnLwi0vq/s8bSH8gkOm4WYZ08IlBBCUkCBEkLIhlCghBCyIRQoIYRsCAVKCCEbQoESQsiuTym+AAADeUlEQVSGUKCEELIhFCghhGwIBUomcLq48fsx3jP2XYTkBQVKJhBfoM/+Ej1K7ECBkglEFyg3RIkpKFCSGMiJFCgxBQVKEkOBku2FAiWJoUDJ9kKBEi/fffxYURS3f7RW2uXHioeeu78orv/88lHju9PF1d/cdW+p9df5nN+Jr1Rve//ndpfvOlvU3HnhWHFn/eyr9xU3Jw5JyAQoUOLh8p8UjhsqP5Z2fLCauPqby0eN9naK4qH6E433ep/zCtTZsvjl3cW75gItvdl8pvzGh0TCErIRFCjxUNrsl0uLvVJua1ZbgaU2i/2f333lc61HjfYWm4lnq6f7n/MJtHzbjd+obXtn612LP9U3VW9yG7eEZAkFSoZZaNFtDlbabLYGl4+c75z1mj34/uc8Ap2/Wn6odmRXoG6jtnyRe/AkZyhQMsyO2wicK25uuvYj5zv31mZ/u/85j0AX+/3u/V2BOgtzD55kDgVK1nF6LlAnwuUj57tSd5Xn+vvbp0MCXX1zZ3O1+Sz34EnmUKAkwM+++7XPvK+YC9TtTrd2rBfau7l7xrz1OY9A+8/2BFpvoHIPnuQOBUp8PPu++en0dQLdqd6x2Hfvfm4zgdY25h48yR0KlAxTnSoqitsf/Ozzp9cK9NX79n++dSqp87nNBFo/2OEePMkcCpQM40Yj7baOgXoFWv6txm7eOfQ5r0CXp6Ru3l0VaLU9e5p78CRzKFAyyPJMUWnGtQLdKW58ttmDX/ncurPwbj+9L9Dy0//gPu7Bk8yhQMkgSxGeXX8MtNTd1b/ePLnyuTXjQHvbqcs3ny6uP8Y9eJI5FCgZxu2Kf/f+or7uKCzQ8sF8i7L/Od+VSDuDVyJVFzNdft69zj14kjsUKBnm1fvdqfQ7/rR2Y1igO8X8mGb/c8i18I02m28vN1G5B09yhwIlHi5/9X3lNuQdf+YGeIYFOj+FtPo55G5MJc+Wz93c3rcnJGMoUJIpZ7kHT7KHAiV5Ut11VHsZCFkDBUry5ALPwZP8oUBJlrzy2OKgKiHZQoESAXaKHmv2zs8WBU8hEQNQoEQAVKDl+2/4hsyiETIBCpQQQjaEAiWEkA2hQAkhZEMoUEII2RAKlBBCNoQCJYSQDaFACSFkQyhQQgjZEAqUEEI2hAIlhJANoUAJIWRDKFBCCNkQCpQQQjaEAiWEkA35/wFIl6KMnB26CAAAAABJRU5ErkJggg==" width="672" /></p>
+<pre class="r"><code>#Note the labels are off, but can be assumed based on the chart colors and sizes. </code></pre>
 </div>
-<div id="step-6-joining-the-two-distinct-dataframes-and-further-cleaning" class="section level3">
-<h3>Step 6: Joining the two distinct dataframes and further
-cleaning</h3>
-<pre class="r"><code># Joining the two dfs
-#Citation for merge: https://www.datanovia.com/en/lessons/rename-data-frame-columns-in-r/
-all_data = merge(x = regular_vals, y = state_vals, by = &quot;join_col&quot;)
-head(all_data)</code></pre>
-<pre><code>##   join_col PairNum          PlayerName TtlPts_1 Round1_1 Round2_1 Round3_1
-## 1        1       1            GARY HUA      6.0    W  39    W  21    W  18
-## 2        3       2     DAKSHESH DARURI      6.0    W  63    W  58    L   4
-## 3        5       3        ADITYA BAJAJ      6.0    L   8    W  61    W  25
-## 4        7       4 PATRICK H SCHILLING      5.5    W  23    D  28    W   2
-## 5        9       5          HANSHI ZUO      5.5    W  45    W  37    D  12
-## 6       11       6         HANSEN SONG      5.0    W  34    D  29    L  11
-##   Round4_1 Round5_1 Round6_1 Round7_1 State           USCFID_RtgPrePost TtlPts2
-## 1    W  14    W   7    D  12    D   4    ON 15445895 / R: 1794   -&gt;1817     N:2
-## 2    W  17    W  16    W  20    W   7    MI 14598900 / R: 1553   -&gt;1663     N:2
-## 3    W  21    W  11    W  13    W  12    MI 14959604 / R: 1384   -&gt;1640     N:2
-## 4    W  26    D   5    W  19    D   1    MI 12616049 / R: 1716   -&gt;1744     N:2
-## 5    D  13    D   4    W  14    W  17    MI 14601533 / R: 1655   -&gt;1690     N:2
-## 6    W  35    D  10    W  27    W  21    OH 15055204 / R: 1686   -&gt;1687     N:3
-##   sec_Round1 Round2_2 Round3_2 Round4_2 Round5_2 Round6_2 Round7_2
-## 1          W        B        W        B        W        B        W
-## 2          B        W        B        W        B        W        B
-## 3          W        B        W        B        W        B        W
-## 4          W        B        W        B        W        B        B
-## 5          B        W        B        W        B        W        B
-## 6          W        B        W        B        B        W        B</code></pre>
-<pre class="r"><code>#Cleaning up the column with the prerating
-all_data$pre_rating &lt;- str_extract(all_data$USCFID_RtgPrePost, &quot;R:\\s*(\\d+)(P\\d+)?\\s*-&gt;&quot;)
-all_data$pre_rating &lt;-str_replace_all(all_data$pre_rating ,&quot;R:&quot;, &quot;&quot;)
-all_data$pre_rating &lt;-str_replace_all(all_data$pre_rating ,&quot;(\\s?-&gt;)|(P(\\d+))&quot;, &quot;&quot;)</code></pre>
-</div>
-<div id="step-7-parsing-out-opponent-and-score-information" class="section level3">
-<h3>Step 7: Parsing Out Opponent and Score information</h3>
-<pre class="r"><code>all_data &lt;- all_data %&gt;% 
-  separate(Round1_1, c(&#39;Round1_Status&#39;, &#39;Round1_Oppnt&#39;)) %&gt;%
-  separate(Round2_1, c(&#39;Round2_Status&#39;, &#39;Round2_Oppnt&#39;)) %&gt;%
-  separate(Round3_1, c(&#39;Round3_Status&#39;, &#39;Round3_Oppnt&#39;)) %&gt;%
-  separate(Round4_1, c(&#39;Round4_Status&#39;, &#39;Round4_Oppnt&#39;)) %&gt;%
-  separate(Round5_1, c(&#39;Round5_Status&#39;, &#39;Round5_Oppnt&#39;)) %&gt;%
-  separate(Round6_1, c(&#39;Round6_Status&#39;, &#39;Round6_Oppnt&#39;)) %&gt;%
-  separate(Round7_1, c(&#39;Round7_Status&#39;, &#39;Round7_Oppnt&#39;))</code></pre>
-<pre><code>## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 4 rows [37, 44,
-## 53, 56].</code></pre>
-<pre><code>## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 2 rows [59, 62].</code></pre>
-<pre><code>## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 4 rows [16, 48,
-## 53, 62].</code></pre>
-<pre><code>## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 2 rows [54, 62].</code></pre>
-<pre><code>## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 12 rows [12, 22, 36, 37,
-## 38, 41, 48, 50, 53, 55, 56, 62].</code></pre>
-<pre><code>## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 6 rows [41, 49, 58, 60,
-## 62, 63].</code></pre>
-<pre><code>## Warning: Expected 2 pieces. Missing pieces filled with `NA` in 10 rows [16, 27, 29, 41,
-## 49, 53, 57, 60, 62, 63].</code></pre>
-<pre class="r"><code>head(all_data)</code></pre>
-<pre><code>##   join_col PairNum          PlayerName TtlPts_1 Round1_Status Round1_Oppnt
-## 1        1       1            GARY HUA      6.0             W           39
-## 2        3       2     DAKSHESH DARURI      6.0             W           63
-## 3        5       3        ADITYA BAJAJ      6.0             L            8
-## 4        7       4 PATRICK H SCHILLING      5.5             W           23
-## 5        9       5          HANSHI ZUO      5.5             W           45
-## 6       11       6         HANSEN SONG      5.0             W           34
-##   Round2_Status Round2_Oppnt Round3_Status Round3_Oppnt Round4_Status
-## 1             W           21             W           18             W
-## 2             W           58             L            4             W
-## 3             W           61             W           25             W
-## 4             D           28             W            2             W
-## 5             W           37             D           12             D
-## 6             D           29             L           11             W
-##   Round4_Oppnt Round5_Status Round5_Oppnt Round6_Status Round6_Oppnt
-## 1           14             W            7             D           12
-## 2           17             W           16             W           20
-## 3           21             W           11             W           13
-## 4           26             D            5             W           19
-## 5           13             D            4             W           14
-## 6           35             D           10             W           27
-##   Round7_Status Round7_Oppnt State           USCFID_RtgPrePost TtlPts2
-## 1             D            4    ON 15445895 / R: 1794   -&gt;1817     N:2
-## 2             W            7    MI 14598900 / R: 1553   -&gt;1663     N:2
-## 3             W           12    MI 14959604 / R: 1384   -&gt;1640     N:2
-## 4             D            1    MI 12616049 / R: 1716   -&gt;1744     N:2
-## 5             W           17    MI 14601533 / R: 1655   -&gt;1690     N:2
-## 6             W           21    OH 15055204 / R: 1686   -&gt;1687     N:3
-##   sec_Round1 Round2_2 Round3_2 Round4_2 Round5_2 Round6_2 Round7_2 pre_rating
-## 1          W        B        W        B        W        B        W     1794  
-## 2          B        W        B        W        B        W        B     1553  
-## 3          W        B        W        B        W        B        W     1384  
-## 4          W        B        W        B        W        B        B     1716  
-## 5          B        W        B        W        B        W        B     1655  
-## 6          W        B        W        B        B        W        B     1686</code></pre>
-</div>
-<div id="step-8-limiting-data-to-two-separate-and-concise-dfs" class="section level3">
-<h3>Step 8: Limiting data to two separate and concise dfs</h3>
-<pre class="r"><code>#Limiting to the columns that we need for the project mandate Plyer Data 
-player_data &lt;- all_data[c(&quot;PairNum&quot;,&quot;PlayerName&quot;,&quot;State&quot;, &quot;TtlPts_1&quot;,&quot;pre_rating&quot;)]
-head(player_data)</code></pre>
-<pre><code>##   PairNum          PlayerName State TtlPts_1 pre_rating
-## 1       1            GARY HUA    ON      6.0     1794  
-## 2       2     DAKSHESH DARURI    MI      6.0     1553  
-## 3       3        ADITYA BAJAJ    MI      6.0     1384  
-## 4       4 PATRICK H SCHILLING    MI      5.5     1716  
-## 5       5          HANSHI ZUO    MI      5.5     1655  
-## 6       6         HANSEN SONG    OH      5.0     1686</code></pre>
-<pre class="r"><code># Limiting to the columns that need parsing for the scores
-scoring_data &lt;- all_data[c(&quot;PairNum&quot;,&quot;Round1_Oppnt&quot;,&quot;Round2_Oppnt&quot;,&quot;Round3_Oppnt&quot;,
-                           &quot;Round4_Oppnt&quot;,&quot;Round5_Oppnt&quot;,&quot;Round6_Oppnt&quot;,&quot;Round7_Oppnt&quot;)]
-
-#### ---- START : DIDNT END UP NEEDING THIS SECTION BECAUSE OF THE na.rm feature. ----
-# scoring_data_transposed &lt;- t(scoring_data)
-# head(scoring_data_transposed)
-
-## Null counts to subrtract from 7 rounds for each play in ordinal fashion
-##Citation: https://www.spsanderson.com/steveondata/posts/2024-05-07/#:~:text=We&#39;ll%20leverage%20the%20colSums,each%20column%20of%20a%20dataframe.&amp;text=In%20this%20code%20snippet%2C%20is,count%20of%20NAs%20per%20column.
-# na_counts &lt;- colSums(is.na(scoring_data_transposed))
-# print(na_counts)
-
-# rounds_played &lt;- 7 - na_counts
-# head(rounds_played)
-
-#Adding to df
-# player_data$rounds_played &lt;-rounds_played
-# head(player_data)
-#### ---- END: DIDNT END UP NEEDING THIS SECTION BECAUSE OF THE na.rm feature. ----</code></pre>
-</div>
-<div id="step-9-reorienting-opponent-data-together" class="section level3">
-<h3>Step 9: Reorienting Opponent Data Together</h3>
-<pre class="r"><code>#New columns for the for loop to place values in 
-scoring_data$opp1_prerate = numeric(nrow(scoring_data))
-scoring_data$opp2_prerate = numeric(nrow(scoring_data))
-scoring_data$opp3_prerate = numeric(nrow(scoring_data))
-scoring_data$opp4_prerate = numeric(nrow(scoring_data))
-scoring_data$opp5_prerate = numeric(nrow(scoring_data))
-scoring_data$opp6_prerate = numeric(nrow(scoring_data))
-scoring_data$opp7_prerate = numeric(nrow(scoring_data))
-
-## if clause citation: https://www.dataquest.io/blog/control-structures-in-r-using-loops-and-if-else-statements/
-for (i in 1:nrow(scoring_data)) {
-  row &lt;- scoring_data[i,]
-  opp1_number = row$Round1_Oppnt
-  opp2_number = row$Round2_Oppnt
-  opp3_number = row$Round3_Oppnt
-  opp4_number = row$Round4_Oppnt
-  opp5_number = row$Round5_Oppnt
-  opp6_number = row$Round6_Oppnt
-  opp7_number = row$Round7_Oppnt
-  if (!is.na(opp1_number)){
-        temp_df1&lt;- player_data %&gt;% filter(PairNum ==opp1_number)
-        scoring_data$opp1_prerate[i] &lt;- as.numeric(temp_df1$pre_rating)
-  }
-  if (!is.na(opp2_number)){
-      temp_df2&lt;- player_data %&gt;% filter(PairNum ==opp2_number)
-      scoring_data$opp2_prerate[i] &lt;- as.numeric(temp_df2$pre_rating)
-  }
-  if (!is.na(opp3_number)){
-      temp_df3&lt;- player_data %&gt;% filter(PairNum ==opp3_number)
-      scoring_data$opp3_prerate[i] &lt;- as.numeric(temp_df3$pre_rating)
-  }
-  if (!is.na(opp4_number)){
-      temp_df4&lt;- player_data %&gt;% filter(PairNum ==opp4_number)
-      scoring_data$opp4_prerate[i] &lt;- as.numeric(temp_df4$pre_rating)
-  }
-  if (!is.na(opp5_number)){
-      temp_df5&lt;- player_data %&gt;% filter(PairNum ==opp5_number)
-      scoring_data$opp5_prerate[i] &lt;- as.numeric(temp_df5$pre_rating)
-  }
-  if (!is.na(opp6_number)){
-      temp_df6&lt;- player_data %&gt;% filter(PairNum ==opp6_number)
-      scoring_data$opp6_prerate[i] &lt;- as.numeric(temp_df6$pre_rating)
-    }
-  if (!is.na(opp7_number)){
-      temp_df7&lt;- player_data %&gt;% filter(PairNum ==opp7_number)
-      scoring_data$opp7_prerate[i] &lt;- as.numeric(temp_df7$pre_rating)
-    }
-}
-
-## Replacing the Zeros fro mhow i made the co;umns with Nulls 
-scoring_data$opp1_prerate[scoring_data$opp1_prerate == 0] &lt;- NA
-scoring_data$opp2_prerate[scoring_data$opp2_prerate == 0] &lt;- NA
-scoring_data$opp3_prerate[scoring_data$opp3_prerate == 0] &lt;- NA
-scoring_data$opp4_prerate[scoring_data$opp4_prerate == 0] &lt;- NA
-scoring_data$opp5_prerate[scoring_data$opp5_prerate == 0] &lt;- NA
-scoring_data$opp6_prerate[scoring_data$opp6_prerate == 0] &lt;- NA
-scoring_data$opp7_prerate[scoring_data$opp7_prerate == 0] &lt;- NA</code></pre>
-</div>
-<div id="step-10-getting-the-means-and-joining" class="section level3">
-<h3>Step 10: Getting the Means and Joining</h3>
-<pre class="r"><code>### Citation: https://stataiml.com/posts/calculate_mean_sel_columns_r/
-scoring_data$opponentavg &lt;- rowMeans(subset(scoring_data,
-                                            select =c(opp1_prerate,opp2_prerate,opp3_prerate,opp4_prerate,
-                                                      opp5_prerate,opp6_prerate,opp7_prerate
-)),
-                                     na.rm = TRUE)
-
-scoring_data_lim &lt;- select(scoring_data,PairNum,opponentavg)
-head(scoring_data_lim)</code></pre>
-<pre><code>##   PairNum opponentavg
-## 1       1    1605.286
-## 2       2    1469.286
-## 3       3    1563.571
-## 4       4    1573.571
-## 5       5    1500.857
-## 6       6    1518.714</code></pre>
-<pre class="r"><code>#merging together for semifinal df
-semifinal = merge(x = player_data, y = scoring_data_lim, by = &quot;PairNum&quot;)
-
-
-## limiting to only the columns i need
-final&lt;- select(semifinal,PlayerName,State,TtlPts_1,pre_rating,opponentavg)
-head(final)</code></pre>
-<pre><code>##                 PlayerName State TtlPts_1 pre_rating opponentavg
-## 1                 GARY HUA    ON      6.0     1794      1605.286
-## 2                ANVIT RAO    MI      5.0     1365      1554.143
-## 3 CAMERON WILLIAM MC LEMAN    MI      4.5     1712      1467.571
-## 4           KENNETH J TACK    MI      4.5     1663      1506.167
-## 5        TORRANCE HENRY JR    MI      4.5     1666      1497.857
-## 6             BRADLEY SHAW    MI      4.5     1610      1515.000</code></pre>
-</div>
-<div id="step-11-place-into-a-csv-file" class="section level3">
-<h3>Step 11: Place into a CSv file</h3>
-<pre class="r"><code>## Placing into a local CSV
-write.csv(final, &quot;ChessPlayerData.csv&quot;)</code></pre>
-</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p><strong>Overall, the airlines are very similar in performance when
+looked at as a percetage of arrival delays compared to all of their
+respective flights. Alaska airlines does have a few more arriaval delays
+than AMWEST. However, when looked at with more of a geographic lense,
+one may want to select Alaska airlines if going to Los Angeles, Phoenix
+or San Diego because AMWEST has many more arrival delays in those
+airports. If traveling to Seattle, one may want to fly with AMWEST. FOr
+San Francisco, both airlines seem to perform similarly. </strong></p>
 </div>
 
 

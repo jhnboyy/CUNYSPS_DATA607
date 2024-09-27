@@ -1,5 +1,5 @@
 ---
-title: "DATA607_Projet1"
+title: "DATA607_Project1"
 author: "John Ferrara"
 date: "`r Sys.Date()`"
 output: html_document
@@ -30,6 +30,10 @@ You may substitute another text file (or set of text files, or data scraped from
 path = path.expand("~/OneDrive/Desktop/CUNY_SPS_Materials/DATA607 - DATA ACQ/Project1/tornamentinfo.txt")
 print(path)
 
+### alternative is to read from git 
+# alt_text <-read.table("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Project1/tornamentinfo.txt",header = FALSE, sep = "\n", dec = ".")
+# alt_text
+
 ## CITATION for read.table:http://www.sthda.com/english/wiki/reading-data-from-txt-csv-files-r-base-functions#google_vignette
 raw_txt <- read.table(path, header = FALSE, sep = "\n", dec = ".")#, ...)
 #Ctation for typeof: https://swcarpentry.github.io/r-novice-inflammation/13-supp-data-structures.html
@@ -45,17 +49,17 @@ print(max_index)
 #Generating the index numbers that i need to parae
 ## Citation: Found the seq() command:https://r02pro.github.io/vector-patterns.html
 dash_entries = seq(from = 1, to = max_index, by = 3)
-print(dash_entries)
+# print(dash_entries)
 
 no_dash <- raw_txt[-c(dash_entries),]
-print(no_dash)
+# print(no_dash)
 
 no_dash_len <- length(no_dash)
-print(no_dash_len)
+# print(no_dash_len)
 
 #Skipping the First two rows that have original raw headers
 raw_data <- no_dash[3:no_dash_len]
-print(raw_data)
+# print(raw_data)
 
 ```
 
@@ -76,8 +80,6 @@ data_frame = data.frame(
 
 # Using a for loop to go item by item to parse, strip and clean. 
 ## For loop Citation : https://epirhandbook.com/new_pages/iteration.html
-
-
 for (raw_row in raw_data) {
     # Removing last pip before splitting
     raw_row <-str_sub(raw_row, end= -1)
@@ -92,7 +94,7 @@ for (raw_row in raw_data) {
 }      
 
 #Checking the dataframe results
-data_frame
+head(data_frame)
 
 
 ```
@@ -107,6 +109,7 @@ regular_index = seq(from = 1, to = length(data_frame[,1]), by = 2)
 #Dealing with the "regular" or primary rows
 regular_vals<-data_frame[c(regular_index),]
 
+#Rename CItation: https://www.datanovia.com/en/lessons/rename-data-frame-columns-in-r/
 regular_vals<-regular_vals %>%
   rename(
      PairNum = PairNum_State,
@@ -124,7 +127,7 @@ regular_vals<-regular_vals %>%
 regular_vals$join_col<-regular_index
 
 #checking results
-regular_vals
+head(regular_vals)
 
 
 ```
@@ -132,6 +135,7 @@ regular_vals
 
 ### Step 5: Parsing from new Datafrme (Secondary ROws)
 ```{r}
+## Secondary Lines that start with state vals
 state_index = seq(from = 2, to = length(data_frame[,1]), by = 2)
 
 state_vals <- data_frame[c(state_index),]
@@ -151,7 +155,7 @@ state_vals<-state_vals %>%
     )
 state_vals$join_col <- regular_index
 
-state_vals
+head(state_vals)
 
 ```
 
@@ -161,13 +165,15 @@ state_vals
 
 ```{r}
 # Joining the two dfs
+#Citation for merge: https://www.datanovia.com/en/lessons/rename-data-frame-columns-in-r/
 all_data = merge(x = regular_vals, y = state_vals, by = "join_col")
-all_data
+head(all_data)
 
 #Cleaning up the column with the prerating
 all_data$pre_rating <- str_extract(all_data$USCFID_RtgPrePost, "R:\\s*(\\d+)(P\\d+)?\\s*->")
 all_data$pre_rating <-str_replace_all(all_data$pre_rating ,"R:", "")
 all_data$pre_rating <-str_replace_all(all_data$pre_rating ,"(\\s?->)|(P(\\d+))", "")
+
 ```
 
 ### Step 7: Parsing Out Opponent and Score information
@@ -181,34 +187,35 @@ all_data <- all_data %>%
   separate(Round6_1, c('Round6_Status', 'Round6_Oppnt')) %>%
   separate(Round7_1, c('Round7_Status', 'Round7_Oppnt'))
 
-all_data
+head(all_data)
 
 ```
 ### Step 8: Limiting data to two separate and concise dfs
 ```{r}
-all_data
-
 #Limiting to the columns that we need for the project mandate Plyer Data 
 player_data <- all_data[c("PairNum","PlayerName","State", "TtlPts_1","pre_rating")]
-player_data
+head(player_data)
 
 # Limiting to the columns that need parsing for the scores
 scoring_data <- all_data[c("PairNum","Round1_Oppnt","Round2_Oppnt","Round3_Oppnt",
                            "Round4_Oppnt","Round5_Oppnt","Round6_Oppnt","Round7_Oppnt")]
-scoring_data_transposed <- t(scoring_data)
-scoring_data_transposed
+
+#### ---- START : DIDNT END UP NEEDING THIS SECTION BECAUSE OF THE na.rm feature. ----
+# scoring_data_transposed <- t(scoring_data)
+# head(scoring_data_transposed)
 
 ## Null counts to subrtract from 7 rounds for each play in ordinal fashion
 ##Citation: https://www.spsanderson.com/steveondata/posts/2024-05-07/#:~:text=We'll%20leverage%20the%20colSums,each%20column%20of%20a%20dataframe.&text=In%20this%20code%20snippet%2C%20is,count%20of%20NAs%20per%20column.
-na_counts <- colSums(is.na(scoring_data_transposed))
-print(na_counts)
+# na_counts <- colSums(is.na(scoring_data_transposed))
+# print(na_counts)
 
-rounds_played <- 7 - na_counts
-rounds_played
+# rounds_played <- 7 - na_counts
+# head(rounds_played)
 
 #Adding to df
-player_data$rounds_played <-rounds_played
-player_data
+# player_data$rounds_played <-rounds_played
+# head(player_data)
+#### ---- END: DIDNT END UP NEEDING THIS SECTION BECAUSE OF THE na.rm feature. ----
 
 ```
 
@@ -223,7 +230,7 @@ scoring_data$opp5_prerate = numeric(nrow(scoring_data))
 scoring_data$opp6_prerate = numeric(nrow(scoring_data))
 scoring_data$opp7_prerate = numeric(nrow(scoring_data))
 
-## if clause citation: 
+## if clause citation: https://www.dataquest.io/blog/control-structures-in-r-using-loops-and-if-else-statements/
 for (i in 1:nrow(scoring_data)) {
   row <- scoring_data[i,]
   opp1_number = row$Round1_Oppnt
@@ -284,15 +291,15 @@ scoring_data$opponentavg <- rowMeans(subset(scoring_data,
                                      na.rm = TRUE)
 
 scoring_data_lim <- select(scoring_data,PairNum,opponentavg)
-scoring_data_lim
+head(scoring_data_lim)
 
 #merging together for semifinal df
 semifinal = merge(x = player_data, y = scoring_data_lim, by = "PairNum")
-semifinal
+
 
 ## limiting to only the columns i need
 final<- select(semifinal,PlayerName,State,TtlPts_1,pre_rating,opponentavg)
-final
+head(final)
 ```
 ### Step 11: Place into a CSv file
 ```{r}
