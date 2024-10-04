@@ -29,18 +29,16 @@ library(tidyverse)
 ## Reading in the created CSV file 
 
 ``` {r reading_in}
-path = path.expand("~/OneDrive/Desktop/CUNY_SPS_Materials/DATA607 - DATA ACQ/Week5/flight_data.csv")
-
-df = read.csv(path)
-df
-
 #Alternatvie Github data ingest (for points)
-alt_data <-read.table("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week5/flight_data.csv",
+df <-read.table("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week5/flight_data.csv",
                       header=TRUE,sep=',')
-alt_data
+df
+## I dont know what the missing data is supposed to be, making the assumption that its formatting that needs fixing
+df[2, 'Airline'] <- "ALASKA"
+df[5, 'Airline'] <- "AMWEST"
+df <-df[!df$Airline == '',]
 
-
-
+df
 ```
 
 ## Working to Transform the data in order to plot and compare the delays
