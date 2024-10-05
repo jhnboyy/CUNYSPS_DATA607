@@ -299,7 +299,7 @@ unique(ice_final$manufacturer)
 #### Analysis
 What you can see in the charts below is that the annual cost for fuel is greatest for EV's, highest for Internal Combustion Engine vehicles, and then in the middle for Plug in Hybrid cars. The overal numbers can be seen in chart 1, while the average total fuel cost by manufacturer can be seen in the second chart. This number is going to vary based on the types of cars a manufacturer makes. If one was purchasing a car it may be best to look at the third chart, where, despite being a bit messy, one can see which costs for car type and manufacturer are lowest and highest. 
 
-``````{r car_comparisons5}
+```{r car_comparisons5}
 ## Plotting 
 #Clatation: https://r-graph-gallery.com/48-grouped-barplot-with-ggplot2.html
 # https://www.andrewheiss.com/blog/2022/06/23/long-labels-ggplot/
@@ -317,7 +317,6 @@ ggplot(car_data_grouped, aes( y=mean_annual_cost, x=manufacturer)) +
 ggplot(car_data_grouped, aes(fill=source, y=mean_annual_cost, x=manufacturer)) + 
     geom_bar(position="dodge", stat="identity", width=.8)+
    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
 ```
 
 ### Working with Dataset Number 2: Buffalo Blizzards
@@ -414,10 +413,72 @@ While structured, I went ahead and decided on NYC vehicular collision data. Thes
 I would be curious to analyze which boroughs had the most accidents, along with if any days of the year tend to be worse than others. I would also like to plot the locations of these accidents and so some geographic analysis on the problem spots in the city, and how these areas improved or got worse overtime. Lastly, for fun, I would also like to do some exploratory work to see if people that drive certain types of cars tend to be in more accidents than others
 
 ### Working Notes
-Dueto the size of this data set the raw bulk data is not on github.For the sake of this analysis and excercise i will limit the accidents to one borough within NYC with the hopes of limiting the size. 
+Due to the size of this data set the raw bulk data is not on github. For the sake of this analysis and excercise i will limit the accidents to one year with the hopes of limiting the size, and placing that subset of the data on github. For ingestion and cleaning. 
 
 ```{r nyc_collisions}
 
+collisions_2023_raw <-read.csv("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Project2/dataset3_subset/nyc_collisions_2023.csv", header=FALSE,sep=',')
+colnames(collisions_2023_raw)<-collisions_2023_raw[1,]
+collisions_2023_raw<-collisions_2023_raw[-c(1),]
 
+## I dont know how to geocode / do overlap intersection with shape files in r using Lat Long, so dropping the nulls in the borough columns. This will impact final numbers.
+
+collisions_2023_raw_lim <-collisions_2023_raw %>% filter(BOROUGH!="")
+
+colnames(collisions_2023_raw_lim) <-make.names(trimws(colnames(collisions_2023_raw_lim)), unique=TRUE)
+
+### keeping the columns we want for deadliest boroughs, and times of year
+collisions_core_columns <- collisions_2023_raw_lim %>% select(
+  "CRASH.DATE","BOROUGH","NUMBER.OF.PERSONS.INJURED", "NUMBER.OF.PERSONS.KILLED")
+#Converting data types 
+
+collisions_core_columns$NUMBER.OF.PERSONS.INJURED<- as.integer(collisions_core_columns$NUMBER.OF.PERSONS.INJURED)
+collisions_core_columns$NUMBER.OF.PERSONS.KILLED<- as.integer(collisions_core_columns$NUMBER.OF.PERSONS.KILLED)
+
+#parsing month out of the date 
+#Citation: https://stackoverflow.com/questions/52672853/how-to-convert-full-date-character-into-mm-dd-yyyy-in-r
+library(lubridate)
+collisions_core_columns$CRASH.DATE <-format(mdy(collisions_core_columns$CRASH.DATE), "%m-%d-%Y")
+
+# Grouping to get counts and sums per month and borough
+boro_summary_collisions<-collisions_core_columns %>% group_by(BOROUGH) %>% summarise(total_injured = sum(NUMBER.OF.PERSONS.INJURED),
+                                                            total_killed = sum(NUMBER.OF.PERSONS.KILLED),
+                                                            total_collisions = n()
+                                                                                ,.groups = 'drop')
+
+## Group by and summarize for months
+## Citation :https://stackoverflow.com/questions/22603847/how-to-extract-month-from-date-in-r
+collisions_core_columns$month<-month(as.numeric(substr(collisions_core_columns$CRASH.DATE,1,2)),label=TRUE)
+month_summary_collisions<-collisions_core_columns %>% group_by(month) %>% summarise(total_injured = sum(NUMBER.OF.PERSONS.INJURED),
+                                                            total_killed = sum(NUMBER.OF.PERSONS.KILLED),
+                                                            total_collisions = n()
+                                                                                ,.groups = 'drop')
+
+
+
+
+```
+
+### Analysis
+
+After removing the null values for borough, and workuing with the data that remained. We then looked at the totla number of vehicular collisions and resulting injuries for each borough. We also took a look at the same stats for each month of the year. Remember that this data is for the year 2023. The data shows that the borough with the most number of people injured in vehicle accidents was brooklyn, brooklyn also had the highest number of accidents too. The safest borough in 2023 was staten island with hte lowest number of accidents and injuries. The second highest numbers for injuries was the bronx, while queens had the second highest number of collisions. When looking to different times of the year, December was the month with the highest number of collisions with July coming in second place. Both of these months were much higher than the other months of the year. When looking at the number of injuries from collisions, July was the month with the most injured, followed by December. 
+```{r collisions_2}
+boro_summary_collisions
+## Plotting injuries by borogh
+### No one was killed in vehicle collisions in 2023, based on the data that had a borough values So just plotting injuries
+ggplot(boro_summary_collisions, aes(y=total_injured, x=BOROUGH, fill=BOROUGH)) + 
+     geom_bar(stat="identity")
+
+## Total collisions by borough
+ggplot(boro_summary_collisions, aes(y=total_collisions, x=BOROUGH, fill=BOROUGH)) + 
+     geom_bar(stat="identity")
+
+
+## Finding the most dangerous Month of the year 2023
+ggplot(month_summary_collisions, aes(y=total_collisions, x=month, fill=month)) + 
+     geom_bar(stat="identity")
+
+ggplot(month_summary_collisions, aes(y=total_injured, x=month, fill=month)) + 
+     geom_bar(stat="identity")
 
 ```
