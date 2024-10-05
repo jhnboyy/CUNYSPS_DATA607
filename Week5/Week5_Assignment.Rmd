@@ -29,12 +29,16 @@ library(tidyverse)
 ## Reading in the created CSV file 
 
 ``` {r reading_in}
-path = path.expand("~/OneDrive/Desktop/CUNY_SPS_Materials/DATA607 - DATA ACQ/Week5/flight_data.csv")
-print(path)
-
-df = read.csv(path)
+#Alternatvie Github data ingest (for points)
+df <-read.table("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week5/flight_data.csv",
+                      header=TRUE,sep=',')
 df
+## I dont know what the missing data is supposed to be, making the assumption that its formatting that needs fixing
+df[2, 'Airline'] <- "ALASKA"
+df[5, 'Airline'] <- "AMWEST"
+df <-df[!df$Airline == '',]
 
+df
 ```
 
 ## Working to Transform the data in order to plot and compare the delays
@@ -51,6 +55,12 @@ long_ontime <- pivot_longer(ontime,
              cols = c("Los.Angeles","Phoenix","San.Diego","San.Francisco","Seattle"), names_to = "arrival_city", values_to ="instance_count")
 long_delay <- pivot_longer(delayed,
              cols = c("Los.Angeles","Phoenix","San.Diego","San.Francisco","Seattle"), names_to = "arrival_city", values_to ="instance_count")
+
+## before placing in long df i want to calc percentages for delays for each city (referenced later on in analysis text)
+temp_pct_work <- inner_join(long_ontime,long_delay, by=c("arrival_city"="arrival_city","Airline"="Airline"),su)
+temp_pct_work$pct_delay <- round((temp_pct_work$instance_count.y/(temp_pct_work$instance_count.x+temp_pct_work$instance_count.y))*100,2)
+temp_pct_work_lim <- temp_pct_work[,c("Airline","arrival_city","pct_delay")]
+temp_pct_work_lim
 
 #Concatenatining them together for one coherent DF 
 # CITATIOn: https://dplyr.tidyverse.org/reference/bind_rows.html
@@ -121,7 +131,7 @@ amwest
 
 ## Analysis
 
-**When all flights are considered Alaska airlines has a total of 13.27% of arrival delays, which is a bit more than the 11.34 percent arrival delays of AMWest. However, when looking at the count of delays by city on the second plot, the arrival delays vary widely depending on location. The best airline with the lesser amount of delays for arrivals in Los Angeles, Phoenix, and San Diego is Alaska airlines. While AMwest is the best airline for arrivals of the two for in Seatle. Arrival delays are San Francisco are more evenly distributed between the airlines, but AMWEST has a little more of them.**
+**When all flights are considered Alaska airlines has a total of 13.27% of arrival delays, which is a bit more than the 11.34 percent arrival delays of AMWest. However, when looking at the COUNT of delays by city on the second plot, the arrival delays vary widely depending on location. The best airline with the lesser amount of delays for arrivals in Los Angeles, Phoenix, and San Diego is Alaska airlines. While AMwest is the best airline for arrivals of the two for in Seatle. Arrival delays are San Francisco are more evenly distributed between the airlines, but AMWEST has a little more of them. Further analysis with percent delays shows the the largest performenace in delays between airlines are in Seattle, SF, and San Diego arrivals. With performance being similar in Phoenix. That being said Alaska has consistantly less percent delays for their flights regardless of city than AMWEST. **
 ```{r analysis}
 #Plotting the main overview stats for relative percent delays performamce
 ggplot(data = stat_table, aes(x=airline, y=pct_del))+
@@ -131,12 +141,21 @@ ggplot(data = stat_table, aes(x=airline, y=pct_del))+
 head(long_flights)
 
 ggplot(data = long_flights%>%filter(Status=='delayed'),aes(x=arrival_city,y=instance_count, fill=Airline))+
-  geom_bar(stat = "identity")+
+  geom_bar(position="dodge",stat = "identity")+
   geom_text(aes(label=instance_count),position = position_dodge(width = 0.8))
+
+
+amwest$pct_del <- (amwest$total_del_count / (alaska$total_del_count + amwest$total_ot_count))*100
+
+## Charting the earlier table for city-specific delays
+ggplot(data =temp_pct_work_lim,aes(x=arrival_city,y=pct_delay, fill=Airline))+
+  geom_bar(position="dodge", stat="identity")+
+  geom_text(aes(label=pct_delay),position = position_dodge(width = 0.8))
+
 
 #Note the labels are off, but can be assumed based on the chart colors and sizes. 
 
 ```
 
 ## Conclusion
-**Overall, the airlines are very similar in performance when looked at as a percetage of arrival delays compared to all of their respective flights. Alaska airlines does have a few more arriaval delays than AMWEST. However, when looked at with more of a geographic lense, one may want to select Alaska airlines if going to Los Angeles, Phoenix or San Diego because AMWEST has many more arrival delays in those airports. If traveling to Seattle, one may want to fly with AMWEST. FOr San Francisco, both airlines seem to perform similarly.  **
+**Overall, the airlines are very similar in performance when looked at as a percentage of arrival delays compared to all of their respective flights. Alaska airlines does have a few more arriaval delays than AMWEST. However, using percent of total flights that get delayed Alaska performs better in every city. THe degree to which this is true, varies by city. The city where Alaska performs the best relative to AMWEST is San Fransisco, while the discrepency in performance is smallest in arrivales to Phoenix. Cities with a larger discrepency in performance between the two airlines will be those where a passenger will want to choose Alaska airlines over AMwest. In the cities with less of a descrepency, then it matters less. **
