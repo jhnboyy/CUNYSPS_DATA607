@@ -1,0 +1,56 @@
+---
+title: "DATA607_Project2"
+author: "John Ferrara"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Project 2
+#### Your task is to: 
+
+**(1)** Choose any three of the “wide” datasets identified in the Week 6 Discussion items. (You may use your own dataset; please don’t use my Sample Post dataset, since that was used in your Week 6 assignment!) For each of the three chosen datasets:
+- Create a .CSV file (or optionally, a MySQL database!) that includes all of the information included in the dataset. You’re encouraged to use a “wide” structure similar to how the information appears in the discussion item, so that you can practice tidying and transformations as described below.
+- Read the information from your .CSV file into R, and use tidyr and dplyr as needed to tidy and transform your data. [Most of your grade will be based on this step!]
+- Perform the analysis requested in the discussion item.
+- Your code should be in an R Markdown file, posted to rpubs.com, and should include narrative descriptions of your data cleanup work, analysis, and conclusions.
+**(2)** Please include in your homework submission, for each of the three chosen datasets:
+- The URL to the .Rmd file in your GitHub repository, and
+- The URL for your rpubs.com web page
+
+
+### Working with Dataset Number 1: Car Comparisons
+**DATA SOURCE: https://brightspace.cuny.edu/d2l/le/437179/discussions/threads/492562/View**
+
+#### Discussion Post: 
+The dataset I am referencing can be found here: https://fueleconomy.gov/feg/download.shtml. This data set has data from a myriad of different makes and models, including gas powered and electric cars. This leads to many unfilled columns where the specs for an electric car would go in rows describing gas powered cars. A good way to tidy this data would be to separate these types of cars, so that we have multiple tables with all of their columns filled. (https://brightspace.cuny.edu/d2l/le/437179/discussions/threads/492562/View)
+
+```{r car_comparisons}
+summary(cars)
+```
+
+### Working with Dataset Number 2: Buffalo Blizzards
+**DATA SOURCE: https://brightspace.cuny.edu/d2l/le/437179/discussions/threads/443928/View**
+
+#### Discussion Post: 
+So I'm actually based in Buffalo and we have a bit of a reputation for snow. Below is an (untidy) data set of recorded snowfall from the National Weather Association. We've made national headlines a few times for record snowfall - see if you can find the worst storms!
+
+```{r buffalo_storms}
+
+```
+
+### Working with Dataset Number 2: NYC Car Accident Data
+**DATA SOURCE: https://brightspace.cuny.edu/d2l/le/437179/discussions/threads/502453/View**
+
+#### Discussion Post: 
+While structured, I went ahead and decided on NYC vehicular collision data. These accidents are those incidents that took place and yielded $1,000  or more in damages. While the data is structured, it is a decently sized one, and is also a wide-type of format, it can most definitely be flattened in some aspects in order to more readily analyze.  The link to the data set is here: https://data.cityofnewyork.us/Public-Safety/Motor-Vehicle-Collisions-Crashes/h9gi-nx95/about_data
+
+I would be curious to analyze which boroughs had the most accidents, along with if any days of the year tend to be worse than others. I would also like to plot the locations of these accidents and so some geographic analysis on the problem spots in the city, and how these areas improved or got worse overtime. Lastly, for fun, I would also like to do some exploratory work to see if people that drive certain types of cars tend to be in more accidents than others
+
+```{r nyc_collisions}
+
+
+```
