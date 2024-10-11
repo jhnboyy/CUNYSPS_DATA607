@@ -24,9 +24,15 @@ accessible from the web]
 
 
 ```{r xml }
-library("methods")
-books <- xmlToDataFrame("books.xml")
+library(methods)
+library(XML)
+
+download.file("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week7/books.xml", "books.xml")
+books <- xmlParse("books.xml")
+# library("methods")
+books <- xmlToDataFrame(books)
 books
+
 ```
 
 ## HTML ingestion
@@ -37,7 +43,7 @@ library(rvest)
 library(tidyr)
 library(dplyr)
 
-html <- read_html("books.html")
+html <- read_html("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week7/books.html")
 df <- data.frame(html_table(html))
 colnames(df)<-df[1,]
 df<-df[-1,]
@@ -48,11 +54,11 @@ df
 ## JSON ingestion
 
 ```{r json}
-install.packages("rjson")
-library("rjson")
-json_data <- fromJSON(file="books.json")
-# json_list <- fromJSON(paste(json_data, collapse = ""))
-json_df
+# library(jsonlite)
+library(rjson)
+json_data <- fromJSON("books.json")
+json_data <- read_json("books.json")
+json_data
 
 ```
 
