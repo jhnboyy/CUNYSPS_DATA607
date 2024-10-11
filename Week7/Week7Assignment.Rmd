@@ -27,8 +27,8 @@ accessible from the web]
 library(methods)
 library(XML)
 
-download.file("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week7/books.xml", "books.xml")
-books <- xmlParse("books.xml")
+download.file("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week7/books.xml", "books_download.xml")
+books <- xmlParse("books_download.xml")
 # library("methods")
 books <- xmlToDataFrame(books)
 books
