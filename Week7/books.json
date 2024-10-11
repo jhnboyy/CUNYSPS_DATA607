@@ -1,0 +1,20 @@
+{"book_1":{
+	"title":"1984",
+	"author":"George Orwell",
+	"category":"fiction",
+	"publication_year":"1949"
+},
+"book_2":{
+	"title":"Fahrenheit 451",
+	"author":"Ray Bradbury",
+	"category":"fiction",
+	"publication_year":"1953"
+},
+"book_3":{
+	"title":"The Talisman",
+	"author":"Stephen King, Peter Straub",
+	"category":"fiction",
+	"publication_year":"1984"
+},
+	
+}
