@@ -20,6 +20,9 @@ Your deliverable is the three source files and the R code. If you can, package y
 an .Rmd file and publish to rpubs.com. [This will also require finding a way to make your three text files
 accessible from the web]
 
+### NOTES ON WORK
+Note the Json Dataframe is different from the HTML and the XML dataframes. The Json df has four rows, but its because i structured the JSON differently from the HTML and XML. The HTML and XML have the two authors as a string separated by a comma, while the JSON has the second author as its own entry. 
+
 ## XML ingestion
 
 
