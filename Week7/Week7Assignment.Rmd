@@ -24,14 +24,15 @@ accessible from the web]
 
 
 ```{r xml }
-library(methods)
 library(XML)
+library(xml2)
 
-download.file("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week7/books.xml", "books_download.xml")
-books <- xmlParse("books_download.xml")
-# library("methods")
+xml_data <- read_xml("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week7/books.xml")
+books <- xmlParse(xml_data)
 books <- xmlToDataFrame(books)
 books
+
+
 
 ```
 
@@ -40,8 +41,6 @@ books
 
 ```{r html}
 library(rvest)
-library(tidyr)
-library(dplyr)
 
 html <- read_html("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week7/books.html")
 df <- data.frame(html_table(html))
@@ -54,11 +53,10 @@ df
 ## JSON ingestion
 
 ```{r json}
-# library(jsonlite)
-library(rjson)
-json_data <- fromJSON("books.json")
-json_data <- read_json("books.json")
-json_data
+library(jsonlite)
 
+json_data <- read_json("https://raw.githubusercontent.com/jhnboyy/CUNYSPS_DATA607/refs/heads/main/Week7/books.json", simplifyVector = TRUE)
+json_df = as.data.frame(json_data)
+json_df
 ```
 
