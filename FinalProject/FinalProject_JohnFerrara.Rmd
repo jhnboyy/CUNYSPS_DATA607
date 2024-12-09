@@ -1,12 +1,12 @@
 ---
-title: "FinalProject - DATA 606 & DATA 607"
+title: "Final Project - DATA 606 & DATA 607"
 author: "John Ferrara"
 date: "`r Sys.Date()`"
 output:
   
-  powerpoint_presentation: default
-  pdf_document: default
   html_document: default
+  pdf_document: default
+  powerpoint_presentation: default
 ---
 
 ```{r setup, include=FALSE}
@@ -24,20 +24,20 @@ library(ggplot2)
 ## Abstract
 This observational study examines whether completed housing-related construction correlates with the adult homeless population, and how homelessness correlates with public syringe recovery in NYC parks. Using data sourced from NYC Open Data, two questions were analyzed: (1) Does completed housing construction projects over the preceding five-year window affect the size of the adult homeless population? (2) Does the size of the adult homeless population correlate with disposed syringe recovery rates? Data from the NYC Department of City Planning for construction projects, NYC Parks Department syringe recovery data, and NYC Department of Homelessness Services homeless population data were analyzed using linear regression models, both at the community district and borough levels.
 
-Several statistically significant relationships were found. At the community district level, more completed construction projects directly correlated with a larger homeless population, possibly reflecting the concentration of construction jobs in wealthier or gentrifying areas. Additionally, an increase in the adult homeless population directly correlated with higher syringe recovery rates in NYC parks. At the more generalized borough level, the correlation between completed construction projects and homelessness was stronger, with  the construction projects explaining roughly 67% of the variance in homelessness populations. Borough-level analysis also revealed an indirect relationship between the average year-over-year increases in completed construction projects and homelessness, suggesting targeted development may help reduce homelessness.
+Several statistically significant relationships were found. At the community district level, more completed construction projects directly correlated with a larger homeless population, possibly reflecting the concentration of construction jobs in wealthier or gentrifying areas. Additionally, an increase in the adult homeless population directly correlated with higher syringe recovery rates in NYC parks. At the more generalized borough level, the correlation between completed construction projects and homelessness was stronger, with the construction projects explaining roughly 67% of the variance in homelessness populations. Borough-level analysis also revealed an indirect relationship between the average year-over-year increases in completed construction projects and homelessness, suggesting targeted development may help reduce homelessness.
 
 These findings highlight connections between housing policy, homelessness, and syringe recovery as a singular dimension of public health. While limitations for this analysis exist, such as a lack of housing data granularity and a lack of non-shelter based homeless counts, the analysis underscores the importance of public data in addressing complex urban challenges.
 
 ## Introduction and Overview
-As most know, in recent years the cost of housing has been outpacing wage growth^1^. Rising housing costs have led to a series of policy issues. While some impacts of high housing costs are obvious, others are less apparent. This analysis explores whether one such issue — the recovery of used syringes in public parks — is correlated to the housing crisis. In short, the overarching question: Does housing impact this seemingly separate public health and safety issue of public, or improper, syringe disposal?
+As most know, in recent years the cost of housing has been outpacing wage growth1. Rising housing costs have led to a series of policy issues. While some impacts of high housing costs are obvious, others are less apparent. This analysis explores whether one such issue — the recovery of used syringes in public parks — is correlated to the housing crisis. In short, the overarching question: Does housing impact this seemingly separate public health and safety issue of public, or improper, syringe disposal?
 
 The overarching question for this observational study must be broken down into two different main questions. The following are the two sub-questions and their respective hypotheses: 
 
 - _Question 1_: Does the Number of Housing Related Construction Projects for the Previous 5 Years correlate with the Size of Adult Homeless Population?
-    - *Null Hypothesis*: The number of housing related construction projects for the preceeding 5 year window period **does not** correlate with the adult homeless population.
-    - *Alternative Hypothesis*: The number of housing related construction projects for the preceeding 5 year window period **does** coreelated with the adult homeless population.
-    - *Independent Variable*: The independent variable in this question is the completed housing-related contstruction projects completed in the preceeding 5 year window from when the homesless population was counted. 
-    - *Dependent Variable*: The dependent variable in this question is the Adult homeless population, as the assumption is as more housing construction projects are completed, more units will be available. Thus reducing unhoused individuals.
+    - *Null Hypothesis*: The number of housing related construction projects for the preceding 5 year window period **does not** correlate with the adult homeless population.
+    - *Alternative Hypothesis*: The number of housing related construction projects for the preceding 5 year window period **does** correlated with the adult homeless population.
+    - *Independent Variable*: The independent variable in this question is the completed housing-related construction projects completed in the preceding 5 year window from when the homeless population was counted. 
+    - *Dependent Variable*: The dependent variable in this question is the Adult homeless population.
 
 - _Question 2_: Does the size of the Adult Homeless Population correlate with the Number of Used Syringes recovered by NYC Parks?
     - *Null Hypothesis*: The size of the Adult homeless population **does not** correlate with the number of used syringes recovered in NYC Parks.
@@ -85,7 +85,7 @@ The data source was downloaded in a zipfile containing multiple csv files for va
 
 *Overview & Data Assumptions*
 
-This data set contained both the NYC Parks Department districts and Community Districts within one file. This geography data was processed so as to flatten the number of Community Districts that were listed for each respective Parks District. For example, if one row of data for Parks District X listed overlaps with Community Districts A, B and C. These three districts, in the raw data, are listed in one cell. This data was parsed so that the one row was extracted into three different rows, having one row for each Community District associated with the Parks District. THe data was essentially flattened long ways, the data was subsequently grouped to get a unique value count for Community Districts per Parks District. The processed table was used as a crosswalk to process the syringe numbers to obtain an estimate of syringe counts at the Community District level. As mentioned, the NYC Syringe Collection data only contained Parks districts, this crosswalk was joined into the syringe data in order to get syringe count estimates for Community Districts. This is discussed further in the methodology section.
+This data set contained both the NYC Parks Department districts and Community Districts within one file. This geography data was processed so as to flatten the number of Community Districts that were listed for each respective Parks District. For example, if one row of data for Parks District X listed overlaps with Community Districts A, B and C. These three districts, in the raw data, are listed in one cell. This data was parsed so that the one row was extracted into three different rows, having one row for each Community District associated with the Parks District. The data was essentially flattened long ways, the data was subsequently grouped to get a unique value count for Community Districts per Parks District. The processed table was used as a crosswalk to process the syringe numbers to obtain an estimate of syringe counts at the Community District level. As mentioned, the NYC Syringe Collection data only contained Parks districts, this crosswalk was joined into the syringe data in order to get syringe count estimates for Community Districts. This is discussed further in the methodology section.
 
 *Source Format & Ingestion Method*
 
@@ -229,7 +229,7 @@ for (i in seq(0, total_rows, by = offset)) {
 raw_hmls <- do.call(rbind, running_pulls)
 
 # Confirming the total number of rows
-# print(paste("Total rows fetched:", nrow(raw_hmls))) ## Shuld be4325
+ #print(paste("Total rows fetched:", nrow(raw_hmls))) ## Shuld be4325
 
 ## Filling in Borough values based on Park District
 raw_hmls_processed<- raw_hmls %>%
@@ -561,13 +561,13 @@ ggplot(adjusted_geom) +
   labs(fill = "Est. Syringes Count", title = "Annual Est. Syringes Recovered in NYC Parks by Comm. Dist.") +
   facet_wrap(~year, ncol = 3) 
 #saving
-# ggsave("SyringesMap.png", width = 8, height = 8, bg='white')
+#ggsave("SyringesMap.png", width = 8, height = 8, bg='white')
 
 ```
 
 **Total Number of Housing Related Construction Projects for 5 Years Previous by Community District**
 
-For the total number of housing related completed construction projects registered with DOB, in the early years the high development zones are limited to Northern Brooklyn and parts on the lower end of Manhattan. As the years progress, the number of projects through out the city, more specifcally in Brooklyn and Queens, increase.
+For the total number of housing related completed construction projects registered with DOB, in the early years the high development zones are limited to Northern Brooklyn and parts on the lower end of Manhattan. As the years progress, the number of projects through out the city, more specifically in Brooklyn and Queens, increase.
 
 ```{r mapping2, echo=FALSE,  warning=FALSE, message=FALSE}
 palette <- scale_fill_viridis_c(option = "inferno", na.value = "grey85", limits = range(adjusted_geom$housingsum, na.rm = TRUE),)
@@ -583,13 +583,13 @@ ggplot(adjusted_geom) +
   labs(fill = "Completed Project Count", title = "Total Number of Housing Projects for Preceeding 5 Yrs by Comm. Dist.") +
   facet_wrap(~year, ncol = 3) 
 #saving
-# ggsave("SumHousingMap.png", width = 8, height = 8, bg='white')
+#ggsave("SumHousingMap.png", width = 8, height = 8, bg='white')
 
 ```
 
 **Average YOY Change for Housing Related Construction Projects 5 Years Previous by Community District**
 
-The average YOY change for completed housing related construction project is faily consistant through out the entire city through out the years in the data. However, the areas of what looks like Sunset Park & Park Slope in Brooklyn exprienced noticably high YOY change in projecs from 2017 through 2020. 
+The average YOY change for completed housing related construction project is fairly consistent through out the entire city through out the years in the data. However, the areas of what looks like Sunset Park & Park Slope in Brooklyn experienced noticeably high YOY change in projects from 2017 through 2020. 
 
 ```{r mapping3, echo=FALSE,  warning=FALSE, message=FALSE}
 palette <- scale_fill_viridis_c(option = "inferno", na.value = "grey85", limits = range(adjusted_geom$prev5_avg_yoy_change, na.rm = TRUE),)
@@ -605,13 +605,13 @@ ggplot(adjusted_geom) +
   labs(fill = "Avg. YOY Percent Change", title = "5 Yr Avg. Pct YOY Change Completed Housing Construction Projects by Year by Comm. Dist.") +
   facet_wrap(~year, ncol = 3) 
 #saving
-# ggsave("HousingYOYChangeMap.png", width = 8, height = 8, bg='white')
+#ggsave("HousingYOYChangeMap.png", width = 8, height = 8, bg='white')
 
 ```
 
 **Annual Average Adult Homeless Population Based On Shelter Counts**
 
-Lastly, for the average annual adult homeless population, there is no data for 2017, but once data is collected for 2018 there are many different parts of the city that have fairly high average adult homeless populations. There doesnt seem to be any particular trend visible just by looking at the data. However, it should be noted, that while this data is useful for gauging the homeless population in the city, at a Community District geographic boundary level, the means by which the data is collected - taking counts at homeless shelters of different kinds - implicity causes the homeless population to be higher in areas that have hotels or shelters designated for that population. This may not necessarily be an issue, but it is something to keep in mind when comparing this variable to others. 
+Lastly, for the average annual adult homeless population, there is no data for 2017, but once data is collected for 2018 there are many different parts of the city that have fairly high average adult homeless populations. There doesn't seem to be any particular trend visible just by looking at the data. However, it should be noted, that while this data is useful for gauging the homeless population in the city, at a Community District geographic boundary level, the means by which the data is collected - taking counts at homeless shelters of different kinds - implicitly causes the homeless population to be higher in areas that have hotels or shelters designated for that population. This may not necessarily be an issue, but it is something to keep in mind when comparing this variable to others. 
 
 ```{r mapping4, echo=FALSE,  warning=FALSE, message=FALSE}
 palette <- scale_fill_viridis_c(option = "inferno", na.value = "grey85", limits = range(adjusted_geom$avg_homeless_count, na.rm = TRUE),)
@@ -627,7 +627,7 @@ ggplot(adjusted_geom) +
   labs(fill = "Avg. Adult Homeless Population", title = "Annual Average of Adult Homeless Population by Comm. Dist.") +
   facet_wrap(~year, ncol = 3) 
 #saving
-# ggsave("HomelessPopMap.png", width = 8, height = 8, bg='white')
+#ggsave("HomelessPopMap.png", width = 8, height = 8, bg='white')
 
 ```
 
@@ -639,13 +639,13 @@ data_final_nonull <- na.omit(data_final)
 
 
 ### Linear Regressions w/ Community District Geographies
-As outlined in the introduction, there are two parts to this analysis. The first is to see if there is a correlation between housing-related construction projects and the homeless population. The second is to see if the size of homeless population correlates with the amount of syringes found in NYC parks. This first attempt at regresssion models will maintain a larger number of data points contrained by community district. However, the wide array of factors that influence various community districts may influence the regression results obfuscating any substantial correlation. Factors such as wealthier, gentrifying areas of the city having more construction projects associated with their geographic boundary, while intravenous drug use is more likely to be concentrated in poorer, less wealthy community districts. Additionally, housing units through out the city may not properly be shown to reduce homelessnes due to the homeless population data being sourced from shelters. Shelters are not evenly distributed throughout the city, making the numbers at the community district level skewed for the overall numbers.
+As outlined in the introduction, there are two parts to this analysis. The first is to see if there is a correlation between housing-related construction projects and the homeless population. The second is to see if the size of homeless population correlates with the amount of syringes found in NYC parks. This first attempt at regression models will maintain a larger number of data points constrained by community district. However, the wide array of factors that influence various community districts may influence the regression results obfuscating any substantial correlation. Factors such as wealthier, gentrifying areas of the city having more construction projects associated with their geographic boundary, while intravenous drug use is more likely to be concentrated in poorer, less wealthy community districts. Additionally, housing units through out the city may not properly be shown to reduce homelessness due to the homeless population data being sourced from shelters. Shelters are not evenly distributed throughout the city, making the numbers at the community district level skewed for the overall numbers.
 
 ### QUESTION 1: Does the Number of Housing Related Construction Projects for the Previous 5 Years influence the Size of Adult Homeless Population?
 
 To answer this question, a linear regression analysis will look at the relationship between the annual average for adult homeless shelter populations and the number of completed housing construction jobs on record with the DOB. For the housing numbers, we will look at the average annual year-over-year (YOY) change in housing construction projects for the five year window previous to the homeless population year, as well as the total number of cumulative housing construction projects completed in for the five years previous to the homeless population year. Lastly, as outlined previously because of the original distributions of he variable a log transform will be used in order to get a more normal distribution for the analyzed variables. 
 
-**MODEL 1: Relationship Between Logged Adult Homeless Population and Logged Completed Housing Construction Projects for Preceeding 5 Years at the Community District Level**
+**MODEL 1: Relationship Between Logged Adult Homeless Population and Logged Completed Housing Construction Projects for Preceding 5 Years at the Community District Level**
 ``` {r m1, echo=FALSE,  warning=FALSE, message=FALSE}
 
 ## Ground Syringes to Housing SUm
@@ -661,6 +661,8 @@ stat_smooth(method = "lm", se = FALSE)+
   labs(x="Logged Total Number of Completed Housing Related Construction Projects for Preceeding 5 Years",
        y="Logged Annual Average of Adult Homeless Population",
        )
+#ggsave("m1.png", width = 8, height = 8, bg='white')
+
 ```
 
 Model 1 **is** Statisitcally Significant, so Checking Model Validity.
@@ -685,13 +687,13 @@ ggplot(data = m1, aes(x = .resid)) +geom_histogram(binwidth = 1) + xlab("Residua
 
 **Model 1 Residual Distribution Check 2**
 ``` {r m1_check3}
-#Variablitiy of Constant
+#Variability of Constant
 ggplot(data = m1, aes(sample = .resid)) +stat_qq()
 ```
 
 The residuals are basically normally distributed. Model most likely valid.
 
-**MODEL 2: Relationship Between Logged Adult Homeless Population and Logged Average YOY Percent Change in Completed Housing Related Construction Projects for Preceeding 5 Years for Preceeding 5 Years at the Community District Level**
+**MODEL 2: Relationship Between Logged Adult Homeless Population and Logged Average YOY Percent Change in Completed Housing Related Construction Projects for Preceding 5 Years at the Community District Level**
 
 ``` {r m2, echo=FALSE, warning=FALSE, message=FALSE}
 ## Ground Syringes to Housing SUm
@@ -707,8 +709,10 @@ stat_smooth(method = "lm", se = FALSE)+
   labs(x="Logged Avg. YOY Pct Change in Completed Housing Related Constr. Projects for Preceeding 5 Years",
        y="Logged Annual Average of Adult Homeless People"
        )
+#ggsave("m2.png", width = 8, height = 8, bg='white')
+
 ```
-Model 2 is **NOT** Statisitcally Significant. Moving On.
+Model 2 is **NOT** Statistically Significant. Moving On.
 
 ### QUESTION 2: Does the size of the Adult Homeless Population influence the Number of Used Syringes recovered by NYC Parks? 
 
@@ -728,6 +732,8 @@ stat_smooth(method = "lm", se = FALSE)+
   labs(x="Logged Est. Total Number of Used Syringes Collected",
        y="Logged Annual Average Adult Homeless Population",
        )
+#ggsave("m3.png", width = 8, height = 8, bg='white')
+
 ```
 
 Model 3 is Statisitcally Significant. Checking Validity. 
@@ -757,7 +763,7 @@ ggplot(data = m3, aes(sample = .resid)) +stat_qq()
 Residuals are normally distributed.Model 3 most likely Valid.
 
 ### Linear Regressions with Aggregate Borough Geographies
-After performing the regression analysis above, the results were unremarkable. There was one statisticly significant relationship - the direct correlation with the number of construction related housing projects and the size of the adult homeless population. Due to potential issues with the data at the Community District level, such as an unequal distribution of parks where syrings can be found, specific types of zoning limiting where shelters exist implicitly skewing homeless populations, or housing projects being limited to select areas. I decided to aggregate to the borough level instead. Generalizing the geographic limitations may show relationships more clearly than the more granular boundaries. The main draw back to this aggregation is a reduction in datapoints, however it is worth taking a look.
+After performing the regression analysis above, the results were unremarkable. There were two statistically significant relationships. Due to potential issues with the data at the Community District level, such as an unequal distribution of parks where syringes can be found, specific types of zoning limiting where shelters exist implicitly skewing homeless populations, or housing projects being limited to select areas. I decided to aggregate to the borough level instead. Generalizing the geographic limitations may show relationships more clearly than the more granular boundaries. The main draw back to this aggregation is a reduction in data points, however it is worth taking a look.
 
 #### Aggregating the data to the borough level.
 
@@ -852,7 +858,7 @@ Not checking the distributions of raw variables again, as I did before. We know 
 
 #### QUESTION 1: Does the Number of Housing Related Construction Projects for the Previous 5 Years influence the Size of Adult Homeless Population?
 
-**MODEL 4: Relationship Between Logged Adult Homeless Population and Logged Total Number of Completed Housing Related Construction Projects for Preceeding 5 Years at the Borough Level**
+**MODEL 4: Relationship Between Logged Adult Homeless Population and Logged Total Number of Completed Housing Related Construction Projects for Preceding 5 Years at the Borough Level**
 ``` {r m4, echo=FALSE, warning=FALSE, message=FALSE}
 
 ## Ground Syringes to Housing SUm
@@ -868,6 +874,9 @@ stat_smooth(method = "lm", se = FALSE)+
         labs(x="Logged Total Number of Completed Housing Related Constr. Projects for Preceeding 5 Years",
        y="Logged Annual Average of Adult Homeless Population",
        )
+#ggsave("m4.png", width = 8, height = 8, bg='white')
+
+
 ```
 
 Model 4 **is** Statisitcally Significant, checking validity.
@@ -895,9 +904,9 @@ ggplot(data = m4, aes(sample = .resid)) +stat_qq()
 
 ```
 
-MODEL 4 may not be valid. Redsiduals and Predicted values have a pattern in the points. The residuals have mostly normal distrubtion. Slight deviation, but normal.
+MODEL 4 may not be valid. Redsiduals and Predicted values have a pattern in the points. The residuals have mostly normal distribution. Slight deviation, but normal.
 
-**MODEL 5: Relationship Between Logged Adult Homeless Population and Logged Average YOY Percent Change in Completed Housing Related Construction Projects for Preceeding 5 Years at the Borough Level**
+**MODEL 5: Relationship Between Logged Adult Homeless Population and Logged Average YOY Percent Change in Completed Housing Related Construction Projects for Preceding 5 Years at the Borough Level**
 
 ``` {r m5, echo=FALSE, warning=FALSE, message=FALSE}
 
@@ -914,6 +923,8 @@ stat_smooth(method = "lm", se = FALSE)+
   labs(x="Logged Average YOY Pct. Chng in Completed Housing Rltd Constr. Projects for Preceeding 5 Years",
        y="Logged Annual Average Adult Homeless Pppulation",
        )
+#ggsave("m5.png", width = 8, height = 8, bg='white')
+
 ```
 Model 5 **is** Statistic Significant, checking validity.
 
@@ -937,7 +948,6 @@ ggplot(data = m5, aes(x = .resid)) +geom_histogram(binwidth = 4) + xlab("Residua
 ``` {r m5_check3}
 #Variablitiy of Constant
 ggplot(data = m5, aes(sample = .resid)) +stat_qq()
-## Slight Deviation b/c of right skew, but passes for normal.
 ```
 
 Model 5 may not be Valid. Residuals are mostly normal, but outliers may skew.
@@ -960,9 +970,10 @@ stat_smooth(method = "lm", se = FALSE)+
       labs(x="Logged Total Number of Used Syringes Collected",
        y="Logged Annual Average Adult Homeless Population",
        )
+ggsave("m6.png", width = 8, height = 8, bg='white')
 ```
 
-Model 6 **is** Statisitcally Significal. Checking Validity
+Model 6 **is** Statistically Significant. Checking Validity
 
 **Model 6 Linearity Check**
 ``` {r m6_check1} 
@@ -985,7 +996,6 @@ ggplot(data = m6, aes(x = .resid)) +geom_histogram(binwidth =5) + xlab("Residual
 ``` {r m6_check3}
 #Variablitiy of Constant
 ggplot(data = m6, aes(sample = .resid)) + stat_qq()
-## Slight Deviation b/c of right skew, but passes for normal.
 ```
 
 Model 6 may not be Valid. Residuals mostly normal.
@@ -1008,38 +1018,38 @@ Of the 6 different attempts at linear regressions to identify strong relationshi
 
 
 #### Community District Level Results
-For the analysis at this Grographic level there was two models with a p-value indicating statistical significance. The first was the relationship between the Average Annual Adult Homeless and the total number of Completed Housing related construction projects. About 27% of the variance in the Homeless population can be explained by the Completed Construction Proejcts. The correlation was direct, which was unexpected. Essentially, the model showed that as the number of completed housing related construction projects for the previous 5 years increased, so did the homeless population. This was surprising because one would expect a negative sloped correlation, or that more construction projects completed the less homeless people. These results refute the Null hypothesis that there is no relationship between the variables, and confirms the alternative hypothesis of the independent variable, completed housing construction projects, impacting the homeless population. However, as mentioned, the result was opposite of what one may expect with a larger homeless popluation correlating with more completed housing projects in the preceeding 5 year window.
+For the analysis at this Geographic level there was two models with a p-value indicating statistical significance. The first was the relationship between the Average Annual Adult Homeless and the total number of Completed Housing related construction projects. About 27% of the variance in the Homeless population can be explained by the Completed Construction Projects. The correlation was direct, which was unexpected. Essentially, the model showed that as the number of completed housing related construction projects for the previous 5 years increased, so did the homeless population. This was surprising because one would expect a negative sloped correlation, or that more construction projects completed the less homeless people. These results refute the Null hypothesis that there is no relationship between the variables, and confirms the alternative hypothesis of the independent variable, completed housing construction projects, impacting the homeless population. However, as mentioned, the result was opposite of what one may expect with a larger homeless population correlating with more completed housing projects in the preceding 5 year window.
 
-The second model that was statistically significant at the Community Distict level, was the direct relationship between the number of syringes collected in NYC Parks and from public disposal sites and the size of the adult homeless population. Roughly 10% of the variance in Syringe Collection counts can be explained by the size of the adult homeles population. These results reject the null hypothesis and confirm the alternative hypothesis. A reduction in the homless popuulation does reduce the number of syringes recovered.
+The second model that was statistically significant at the Community District level, was the direct relationship between the number of syringes collected in NYC Parks and from public disposal sites and the size of the adult homeless population. Roughly 10% of the variance in Syringe Collection counts can be explained by the size of the adult homeless population. These results reject the null hypothesis and confirm the alternative hypothesis. A reduction in the homeless population does reduce the number of syringes recovered.
 
 #### Borough Level Results
 Due to various limitations of the data when examined at the community district level, the same analysis was carried out at the borough level. This generalization of geographic boundaries can help control for the wide variance of city zoning for shelters, the varying presence of parks, and uneven concentration of housing developments between community districts. All three models at the borough level were statistically significant.
 
-Similar to the Community District analysis, a direct relationship was found between the Adult homeless population and the Total Completed Housing Construction Projects for the previous 5 year window. At the borough level, about 67% of the variance for the size of the homeless population can be explained by the number of completed housing related construction projects for the preceeding 5 year window. This is a stronger direct correlation than at the community district level. 
+Similar to the Community District analysis, a direct relationship was found between the Adult homeless population and the Total Completed Housing Construction Projects for the previous 5 year window. At the borough level, about 67% of the variance for the size of the homeless population can be explained by the number of completed housing related construction projects for the preceding 5 year window. This is a stronger direct correlation than at the community district level. 
 
-Unlike the community district level analysis, the relationship between the YOY average change in completed housing related construction projects and the adult homeless population was statistically significant. This relationship was found to be an indirect one, with about 15% of the variance in the homeless population being explained by the Average YOY Change in projects for the preceeding 5 year window. This is more inline with what one would expect, with an increase in housing related construction projects the homless population would decreas.
+Unlike the community district level analysis, the relationship between the YOY average change in completed housing related construction projects and the adult homeless population was statistically significant. This relationship was found to be an indirect one, with about 15% of the variance in the homeless population being explained by the Average YOY Change in projects for the preceding 5 year window. This is more inline with what one would expect, with an increase in housing related construction projects the homeless population would decrease.
 
 Both of these models refute the null hypothesis of no relationship between the completion of housing related construction project and the adult homeless populations, but they do so in different ways. 
 
-Lastly, the model at the borough level that explores the relationship between the syringes collected and the size of the adult homeless population shows a direct relationship. An increase in the adult homeless population does increase the number of syringes collected. About 19% of the variance in the amount of syringes collected can be explained by the adult homeless population. THis refutes the null hypothesis and confirms the alternative hypothesis for question two.
+Lastly, the model at the borough level that explores the relationship between the syringes collected and the size of the adult homeless population shows a direct relationship. An increase in the adult homeless population does increase the number of syringes collected. About 19% of the variance in the amount of syringes collected can be explained by the adult homeless population. This refutes the null hypothesis and confirms the alternative hypothesis for question two.
 
 #### Overall Conclusion
 
-Overall, the null hypotheses were refuted for both questions, with both alternative hypotheses being confirmed. The number of completed housing related construction projects in the preceeding 5 years for an area does in fact correlate to the size of homeless adult shelter population. Similarly, the size of the adult homeless popualtion does correlate with the number of syringes collected from parks and other public disposal units. 
+Overall, the null hypotheses were refuted for both questions, with both alternative hypotheses being confirmed. The number of completed housing related construction projects in the preceding 5 years for an area does in fact correlate to the size of homeless adult shelter population. Similarly, the size of the adult homeless population does correlate with the number of syringes collected from parks and other public disposal units. 
 
-The direct relationships between total construction projects completed and homeless population data may be explained by wealthier and gentrifying parts of the city consistently have the attention and resources of developers to create more market-rate and luxury housing via these construction project. The proliferation of such projects may exacerbate the issues surrounding afforabable housing. In my view, this is confirmed by the the indirect relationship between  the five year average YOY percent change in construction project and the homeless population. Larger YOY increases in completed construction projects may imply a sudden increase in completed construction jobs in areas typically neglected by high-end realestate developers and development general, thus having an indirect relationship with the homless population. A large average YOY increase in completed construction projects may also imply city planning aimed at helping areas in need of more housing, again helping explain the indirect relationship. 
+The direct relationships between total construction projects completed and homeless population data may be explained by wealthier and gentrifying parts of the city consistently have the attention and resources of developers to create more market-rate and luxury housing via these construction project. The proliferation of such projects may exacerbate the issues surrounding affordable housing. In my view, this is confirmed by the the indirect relationship between  the five year average YOY percent change in construction project and the homeless population. Larger YOY increases in completed construction projects may imply a sudden increase in completed construction jobs in areas typically neglected by high-end real estate developers and development general, thus having an indirect relationship with the homeless population. A large average YOY increase in completed construction projects may also imply city planning aimed at helping areas in need of more housing, again helping explain the indirect relationship. 
 
 Lastly, the direct relationship between the adult unhoused population and the number of recovered syringes from parks and disposal sites does suggest that this public health issue may be reduced in part by reducing the adult homeless population by increasing the number of housing construction projects.
 
 #### Limitations of Analysis
 
-While conclusions can be drawn from this analysis there are several data limitations that should be noted. The housing data used in this analysis is for housing-related completed construction projects, this data does not differentiate between high-end developments nor between construction projecs that adds housing units to the market, or other types of nuance. More granular housing data would be ideal for this type of regression analysis, such as total units added to market, total affordable housing units added to market, how many rent stabilized units were removed from the market through renovation loopholes, etc. 
+While conclusions can be drawn from this analysis there are several data limitations that should be noted. The housing data used in this analysis is for housing-related completed construction projects, this data does not differentiate between high-end developments nor between construction projects that adds housing units to the market, or other types of nuance. More granular housing data would be ideal for this type of regression analysis, such as total units added to market, total affordable housing units added to market, how many rent stabilized units were removed from the market through renovation loopholes, etc. 
 
 Further limitations stem from the widely varying variables for each geographic boundary. While Community District variation and the geographic differences in the syringe collection data were accounted for by the aggregation up to the borough level, the variance between boroughs is not accounted for. Each of the boroughs zoning, parks land, and shelter presence varies widely. There was simply not enough years of data to analyze these variables at the city-level. 
 
-Additionally, the adult homeless population data used in this analysis orginated at counts from the shelter system. This does not take into account the unhoused population that makes no use of the shelter system, so there may be a large blind spot not considered in this analysis. 
+Additionally, the adult homeless population data used in this analysis originated at counts from the shelter system. This does not take into account the unhoused population that makes no use of the shelter system, so there may be a large blind spot not considered in this analysis. 
 
-Lastly, several of the variables had floor effects on their distributions due to the nature of the variables. Log transformations were used, but there still were a large number of zero values for several of the variables examined. This analysis, other than logging the data, did not accomodate for this by removing outliers, weighing datapoints, or by other means. With this said, as shown by the model validitiy tests for linearity, some patterns are discernable. This may mean that these models are invalid and the conditions for linearity may not be met. The inclusion of these zero values and some outliers is another limitation of this analysios. Future work, should attempt to further clean and process the data so as to create more valid models.
+Lastly, several of the variables had floor effects on their distributions due to the nature of the variables. Log transformations were used, but there still were a large number of zero values for several of the variables examined. This analysis, other than logging the data, did not accommodate for this by removing outliers, weighing data points, or by other means. With this said, as shown by the model validity tests for linearity, some patterns are discernible in the data. This may mean that these models are invalid and the conditions for linearity may not be met. The inclusion of these zero values and some outliers is another limitation of this analysis. Future work, should attempt to further clean and process the data so as to create more valid models.
 
 ## References
 
