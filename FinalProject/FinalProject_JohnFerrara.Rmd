@@ -3,8 +3,10 @@ title: "FinalProject - DATA 606 & DATA 607"
 author: "John Ferrara"
 date: "`r Sys.Date()`"
 output:
-  html_document: default
+  
+  powerpoint_presentation: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
