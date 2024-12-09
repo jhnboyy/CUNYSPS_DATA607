@@ -27,26 +27,26 @@ Several statistically significant relationships were found. At the community dis
 These findings highlight connections between housing policy, homelessness, and syringe recovery as a singular dimension of public health. While limitations for this analysis exist, such as a lack of housing data granularity and a lack of non-shelter based homeless counts, the analysis underscores the importance of public data in addressing complex urban challenges.
 
 ## Introduction and Overview
-As most know, in recent years the cost of housing has been outpacing wage growth^1^. Rising housing costs have led to a series of policy issues. While some impacts of high housing costs are obvious, others are less apparent. This analysis explores whether one such issue — the recovery of used syringes in public parks — can be linked to the housing crisis. In short, the overarching question: Does housing impact this seemingly separate public health and safety issue of public, or improper, syringe disposal?
+As most know, in recent years the cost of housing has been outpacing wage growth^1^. Rising housing costs have led to a series of policy issues. While some impacts of high housing costs are obvious, others are less apparent. This analysis explores whether one such issue — the recovery of used syringes in public parks — is correlated to the housing crisis. In short, the overarching question: Does housing impact this seemingly separate public health and safety issue of public, or improper, syringe disposal?
 
 The overarching question for this observational study must be broken down into two different main questions. The following are the two sub-questions and their respective hypotheses: 
 
-- _Question 1_: Does the Number of Housing Related Construction Projects for the Previous 5 Years influence the Size of Adult Homeless Population?
-    - *Null Hypothesis*: The number of housing related construction projects for the preceeding 5 year window period **does not** have an impact on the adult homeless population.
-    - *Alternative Hypothesis*: The number of housing related construction projects for the preceeding 5 year window period **does** impact the adult homeless population.
+- _Question 1_: Does the Number of Housing Related Construction Projects for the Previous 5 Years correlate with the Size of Adult Homeless Population?
+    - *Null Hypothesis*: The number of housing related construction projects for the preceeding 5 year window period **does not** correlate with the adult homeless population.
+    - *Alternative Hypothesis*: The number of housing related construction projects for the preceeding 5 year window period **does** coreelated with the adult homeless population.
     - *Independent Variable*: The independent variable in this question is the completed housing-related contstruction projects completed in the preceeding 5 year window from when the homesless population was counted. 
     - *Dependent Variable*: The dependent variable in this question is the Adult homeless population, as the assumption is as more housing construction projects are completed, more units will be available. Thus reducing unhoused individuals.
 
-- _Question 2_: Does the size of the Adult Homeless Population influence the Number of Used Syringes recovered by NYC Parks?
-    - *Null Hypothesis*: The size of the Adult homeless population **does not** influence the number of used syringes recovered in NYC Parks.
-    - *Alternative Hypothesis*: The size of the Adult homeless population **does** the number of used syringes recovered in NYC Parks.
+- _Question 2_: Does the size of the Adult Homeless Population correlate with the Number of Used Syringes recovered by NYC Parks?
+    - *Null Hypothesis*: The size of the Adult homeless population **does not** correlate with the number of used syringes recovered in NYC Parks.
+    - *Alternative Hypothesis*: The size of the Adult homeless population **does** correlate with the number of used syringes recovered in NYC Parks.
     - *Independent Variable*: The independent variable in this question is the adult unhoused population. 
     - *Dependent Variable*: The dependent variable in this question is the total syringes collected from NYC Parks and public safe disposal sites.
 
-It should be noted that these are large questions. Questions that are much more nuanced and complex than any single analysis can outline, so while this study seeks to demonstrate a link between varying dimensions of public policy, it is by no means an attempt at a solution. Rather, the study seeks to determine if there is an overlap between these issues using several sources of public data.
+It should be noted that these are large questions. Questions that are much more nuanced and complex than any single analysis can outline, so while this study seeks to demonstrate a correlation between varying dimensions of public policy implications, it is by no means an attempt at a solution. Rather, the study seeks to determine if there is an overlap between these issues using several sources of public data.
 
 ## Data Sources
-There are multiple data sources used in this study. Most, if not all, were sourced from NYC Open Data () a website that provides a multitude of public data sets generated by New York City government agencies. The data used in this analysis were:
+There are multiple data sources used in this study. Most, if not all, were sourced from [NYC Open Data](https://opendata.cityofnewyork.us/) a website that provides a multitude of public data sets generated by New York City government agencies. The data used in this analysis were:
 
 **- Dataset 1: [NYC Parks Syringe Collection Data](https://data.cityofnewyork.us/Public-Safety/Summary-of-Syringe-Data-in-NYC-Parks/t8xi-d5wb/about_data)**
 
@@ -121,7 +121,6 @@ The Syringe data had totals for each park district on each date that the syringe
 
 #### Controlling for Varying Geographies 
 As mentioned, the incongruities of the geographic units between the Community District-based housing and homeless datasets and the NYC Parks District syringe collection data set mandated the raw syringe totals be processed to yield a syringe estimate for Community District. Community Districts are a city-wide administrative boundary associated with the city’s community boards, while the parks districts are an internal NYC Parks Department administrative boundary. These two geographic boundaries do not have a 1:1 relationship with each other. There were instances of a singular community district overlapping with multiple parks districts, and vice versa. In order to approximate the number of syringes per community district, I simply divided the total number of syringes for each parks drastic by the total number of distinct Community Districts in each respective parks district. While this methodology is imperfect, the syringe collection data did not have Latitude and Longitude for each collected syringe or for specific collection sites, so a spatial join using shapefile geographies could not be completed.
-
 
 #### Housing Data 
 The housing data that was used was imported after downloading a zip file from 2023 Q4, and using one Community District-specific CSV from the batch of files. The CSV used contains annual counts fr the number of completed housing constructions projects fr each year from 2010 through 2023 by community district. For this analysis the assumption was made that the number of syringes collected in an area, provided that syringe collection is impacted by new housing units, would be a lagging indicator. With this mindset, the number of completed housing construction projects in a community district for five years prior to the year the syringes were collected, was the aggregate version of housing numbers used for the analysis In other words, for each year in the syringe collection data, the preceding five years of construction jobs were summed up and the average Year-Over-Year change in construction jobs for those years were calculated. For instance, for the total number of estimated syringes collected for a Community District in 2017, the metrics for housing-related construction jobs within that same community district would be the aggregate sum of all housing jobs from 2011 through 2016, as well as the average Year-Over-Year change in housing jobs for those years. This aggregation into two main columns for each annually summed community district row allowed for the housing numbers to be joined with the Syringe Collection data.
@@ -429,65 +428,79 @@ data_final <- housing_syringe_df[,c("year","borough","communitydistrict",
 Firstly, let's take a look at the data itself and see what the processed data shows us about these three dimensions of data. 
 
 ### Basic Summary Statistics 
-```{r sum_stat}
-## Number of Rows in finalized Data
-# print(nrow(data_final)) #570
 
-## Year Coverage
-#Syringes
-unique(data_final$year[!is.na(data_final$total_syringe_ests)])#Syringe Counts have Values from 2017 through 2024
-
-#Homeless Shelter Pops
-unique(data_final$year[!is.na(data_final$avg_homeless_count)])# 2018 through 2024
-
-#Construction Housing Projecrs ( this should match the Syringe Count b/c of processing)
-unique(data_final$year[!is.na(data_final$housingsum)])# 2017 through 2024
-```
-
-``` {r sum_stat2}
-## SUmmary for Syringes
+**SUmmary for Syringes**
+``` {r sum_stata,  warning=FALSE, message=FALSE}
 print(summary(data_final$total_syringe_ests))
+```
 
-## SUmmary for Avg. Homeless
+**Summary for Avg. Homeless**
+``` {r sum_statb,  warning=FALSE, message=FALSE}
 print(summary(data_final$avg_homeless_count))
+```
 
-## Summary for Housing Sum
+**Summary for Housing Sum**
+``` {r sum_statc,  warning=FALSE, message=FALSE}
 print(summary(data_final$housingsum))
+```
 
-## Summary for Housing YOY Change
+**Summary for Housing YOY Change**
+``` {r sum_statd,  warning=FALSE, message=FALSE}
 print(summary(data_final$prev5_avg_yoy_change))
-
 ```
 
-### Histogram for Ditributions
-``` {r hist_dist}
-### Syringes
-ggplot(data_final, aes(x = total_syringe_ests)) + geom_histogram(binwidth = 2000)
-#### Floor at Zero, cant have negative Syringes. Log Transform Needed.
-ggplot(data_final, aes(x = log(total_syringe_ests+1))) + geom_histogram(binwidth = 1)
-
-
-### Avg. Annual Adult Homeless POpulation
-ggplot(data_final, aes(x = avg_homeless_count)) + geom_histogram(binwidth = 200)
-### Floor at Zero b/c cant have negative people. Log Transform needed.
-ggplot(data_final, aes(x = log(avg_homeless_count+1))) + geom_histogram(binwidth = 1)
-
-
-### Prev.5 Yr Window Completed Housing Construction Porject Sum
-ggplot(data_final, aes(x = housingsum)) + geom_histogram(binwidth = 200)
-## Has semi-hard Floor at zero, Trying Log Transform.
-ggplot(data_final, aes(x = log(housingsum+1))) + geom_histogram(binwidth = 1)
-## Still high count at 0, best I can do. 
-
-
-### Prev.5 Yr Window Avg. YOY  Pct. Change Completed Housing Construction Projects
-ggplot(data_final, aes(x = prev5_avg_yoy_change)) + geom_histogram(binwidth = 500)
-#Checking Log Transform Distribution
-ggplot(data_final, aes(x = log(prev5_avg_yoy_change+1))) + geom_histogram(binwidth = 1)
-## Log looks much better for normal dist.
-
+### Histograms for Distributions
+**Syringe Data**
+``` {r hist_dist1a, warning=FALSE, message=FALSE}
+ggplot(data_final, aes(x = total_syringe_ests)) + geom_histogram(binwidth = 2000)+ xlab("Est. Total Syringe Collected")
 ```
-After taking a look at the histograms for each of these variables that I want to analyze, because of the zero floors for several of them and the original distributions, Log transformations provide a more normal distribution to analyze. Will use the log transformations in regressions. 
+Has a floor at Zero, cant have negative Syringes. Log Transform Needed.
+
+**Logged Syringe Data**
+``` {r hist_dist1b, warning=FALSE, message=FALSE}
+ggplot(data_final, aes(x = log(total_syringe_ests+1))) + geom_histogram(binwidth = 1) + xlab("Logged Est. Total Syringe Collected")
+```
+Looks better than original.
+
+**Adult Homeless Population**
+```{r hist_dist2a, warning=FALSE, message=FALSE}
+ggplot(data_final, aes(x = avg_homeless_count)) + geom_histogram(binwidth = 200)+ xlab("Avg. Annual Adult Homeless Population")
+```
+Has a floor at zero b/c cant have negative people. Log Transform needed.
+
+**Logged Adult Homeless Population**
+```{r hist_dist2b, warning=FALSE, message=FALSE}
+ggplot(data_final, aes(x = log(avg_homeless_count+1))) + geom_histogram(binwidth = 1)+xlab("Logged Avg. Annual Adult Homeless Population")
+```
+Looks better.
+
+**Total 5 Yr Completed Construction Projects**
+``` {r hist_dist3a, warning=FALSE, message=FALSE}
+ggplot(data_final, aes(x = housingsum)) + geom_histogram(binwidth = 200) + xlab("Total 5 Yr Completed Construction Projects")
+```
+Has clustering at zero, trying Log Transform.
+
+**Logged Total 5 Yr Completed Construction Projects**
+``` {r hist_dist3b, warning=FALSE, message=FALSE}
+ggplot(data_final, aes(x = log(housingsum+1))) + geom_histogram(binwidth = 1) + xlab("Logged Total 5 Yr Completed Construction Projects")
+```
+Still high count at 0, best I can do. 
+
+
+**Avg. 5 Yr YOY Pct. Change in Completed Construction Projects**
+``` {r hist_dist4a, warning=FALSE, message=FALSE}
+ggplot(data_final, aes(x = prev5_avg_yoy_change)) + geom_histogram(binwidth = 500)+xlab("Avg. 5 Yr YOY Pct. Change in Completed Construction Projects")
+```
+
+Checking the log distribution.
+
+**Logged Avg. 5 Yr YOY Pct. Change in Completed Construction Projects**
+``` {r hist_dist4b, warning=FALSE, message=FALSE}
+ggplot(data_final, aes(x = log(prev5_avg_yoy_change+1))) + geom_histogram(binwidth = 1) +xlab("Logged Avg. 5 Yr YOY Pct. Change in Completed Construction Projects")
+```
+Log looks better for nor. dist.
+
+After taking a look at the histograms for each of these variables that I want to analyze, because of the zero floors for several of them and the original distributions, Log transformations provide a more normal distribution to analyze. I will use the log transformations in regressions. 
 
 ### Prepping for Map Visuals
 ```{r  geojson_map_prep}
@@ -624,7 +637,7 @@ data_final_nonull <- na.omit(data_final)
 
 
 ### Linear Regressions w/ Community District Geographies
-As outlined in the introduction, there are two parts to this analysis. The first is to see if there is a correlation between housing-related construction projects and the homeless population. The second is to see if the homeless population correlates with the amount of syringes found in NYC parks and other public safe disposal areas. This first attempt at regresssions will maintain a larger number of data points contrained by community district. However, the varying factors that influence various community districts may influence the regression results obfuscating any substantial correlation. Factors such as high demand, gentrifying areas of the city having more construction projects associated with their geographic boundary, while intravenous drug use is more likely to be concentrated in poorer, less "in-demand" community districts. Additionally, addtionally housing units through out the city may not properly be shown to reduce homelessnes due to the homeless population data being sourced from shelters. Shelters are not evenly distributed throughout the city, making the numbers at the community district level skewed for the overall numbers.
+As outlined in the introduction, there are two parts to this analysis. The first is to see if there is a correlation between housing-related construction projects and the homeless population. The second is to see if the size of homeless population correlates with the amount of syringes found in NYC parks. This first attempt at regresssion models will maintain a larger number of data points contrained by community district. However, the wide array of factors that influence various community districts may influence the regression results obfuscating any substantial correlation. Factors such as wealthier, gentrifying areas of the city having more construction projects associated with their geographic boundary, while intravenous drug use is more likely to be concentrated in poorer, less wealthy community districts. Additionally, housing units through out the city may not properly be shown to reduce homelessnes due to the homeless population data being sourced from shelters. Shelters are not evenly distributed throughout the city, making the numbers at the community district level skewed for the overall numbers.
 
 ### QUESTION 1: Does the Number of Housing Related Construction Projects for the Previous 5 Years influence the Size of Adult Homeless Population?
 
@@ -658,8 +671,9 @@ ggplot(m1, aes(x=.fitted, y=.resid)) +
   geom_point()+
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(x = "Predicted",y ="Residuals")
-## Seems to be slight correlation in lower portion. However, line seems to have Zero Slope.
 ```
+There seems to be slight correlation in lower portion.  Line seems to have Zero Slope.
+
 
 **Model 1 Residual Distribution Check 1 **
 ``` {r m1_check2}
@@ -673,7 +687,7 @@ ggplot(data = m1, aes(x = .resid)) +geom_histogram(binwidth = 1) + xlab("Residua
 ggplot(data = m1, aes(sample = .resid)) +stat_qq()
 ```
 
-Model 1 is Valid. The slope of the line for Residuals and Predicated vaues is zero. Best fit. The residualts ar also normally distributed.
+The residuals are basically normally distributed. Model most likely valid.
 
 **MODEL 2: Relationship Between Logged Adult Homeless Population and Logged Average YOY Percent Change in Completed Housing Related Construction Projects for Preceeding 5 Years for Preceeding 5 Years at the Community District Level**
 
@@ -724,6 +738,7 @@ ggplot(m3, aes(x=.fitted, y=.resid)) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(x = "Fitted values",y ="Residuals")
 ```
+Linearity Check should be good. 
 
 **Model 3 Residual Distribution Check 1 **
 ``` {r m3_check2}
@@ -737,8 +752,7 @@ ggplot(data = m3, aes(x = .resid)) +geom_histogram(binwidth = 1) + xlab("Residua
 ggplot(data = m3, aes(sample = .resid)) +stat_qq()
 ## Slight Deviation b/c of right skew, but passes for normal.
 ```
-
-Model 3 **is** Valid. Residual distribution is normal, and predicted values vs. residuals has slope if zero.
+Residuals are normally distributed.Model 3 most likely Valid.
 
 ### Linear Regressions with Aggregate Borough Geographies
 After performing the regression analysis above, the results were unremarkable. There was one statisticly significant relationship - the direct correlation with the number of construction related housing projects and the size of the adult homeless population. Due to potential issues with the data at the Community District level, such as an unequal distribution of parks where syrings can be found, specific types of zoning limiting where shelters exist implicitly skewing homeless populations, or housing projects being limited to select areas. I decided to aggregate to the borough level instead. Generalizing the geographic limitations may show relationships more clearly than the more granular boundaries. The main draw back to this aggregation is a reduction in datapoints, however it is worth taking a look.
@@ -863,8 +877,8 @@ ggplot(m4, aes(x=.fitted, y=.resid)) +
   geom_point()+
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(x = "Fitted values",y ="Residuals")
-##
 ```
+Linearity Check doesnt seem to pass. There is a pattern in the  portions of the data. 
 
 **Model 4 Residual Distribution Check 1 **
 ``` {r m4_check2}
@@ -879,7 +893,7 @@ ggplot(data = m4, aes(sample = .resid)) +stat_qq()
 
 ```
 
-MODEL 4 is valid. Redsiduals and Predicted values have slope of zero. The residuals have mostly normal distrubtion. Slight deviation, but normal.
+MODEL 4 may not be valid. Redsiduals and Predicted values have a pattern in the points. The residuals have mostly normal distrubtion. Slight deviation, but normal.
 
 **MODEL 5: Relationship Between Logged Adult Homeless Population and Logged Average YOY Percent Change in Completed Housing Related Construction Projects for Preceeding 5 Years at the Borough Level**
 
@@ -908,13 +922,13 @@ ggplot(m5, aes(x=.fitted, y=.resid)) +
   geom_point()+
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(x = "Fitted values",y ="Residuals")
-##
 ```
+Slight pattern with outliers. May skew regression. 
 
 **Model 5 Residual Distribution Check 1 **
 ``` {r m5_check2}
 # Residual Dist.
-ggplot(data = m5, aes(x = .resid)) +geom_histogram(binwidth = 1) + xlab("Residuals")
+ggplot(data = m5, aes(x = .resid)) +geom_histogram(binwidth = 4) + xlab("Residuals")
 ```
 
 **Model 5 Residual Distribution Check 2**
@@ -924,7 +938,7 @@ ggplot(data = m5, aes(sample = .resid)) +stat_qq()
 ## Slight Deviation b/c of right skew, but passes for normal.
 ```
 
-Model 5 **is** Valid. Residuals are mostly normal, linearity checks out. ????????
+Model 5 may not be Valid. Residuals are mostly normal, but outliers may skew.
 
 #### QUESTION 2: Does the size of the Adult Homeless Population influence the Number of Used Syringes recovered by NYC Parks? 
 
@@ -957,11 +971,12 @@ ggplot(m6, aes(x=.fitted, y=.resid)) +
   labs(x = "Fitted values",y ="Residuals")
 ##
 ```
+May not be valid, the poitns are clustered and not random.
 
 **Model 6 Residual Distribution Check 1 **
 ``` {r m6_check2}
 # Residual Dist.
-ggplot(data = m6, aes(x = .resid)) +geom_histogram(binwidth =1) + xlab("Residuals")
+ggplot(data = m6, aes(x = .resid)) +geom_histogram(binwidth =5) + xlab("Residuals")
 ```
 
 **Model 6 Residual Distribution Check 2**
@@ -971,7 +986,7 @@ ggplot(data = m6, aes(sample = .resid)) + stat_qq()
 ## Slight Deviation b/c of right skew, but passes for normal.
 ```
 
-Model 6 **is** Valid. Residuals mostly normal, and linearity test shows zero slope. 
+Model 6 may not be Valid. Residuals mostly normal.
 
 ## Results & Conclusion
 
@@ -979,13 +994,14 @@ Of the 6 different attempts at linear regressions to identify strong relationshi
 
 **RESULTS TABLE: Statistically Significant Models**
 
-| Regression Analysis                                      | Geography Level      | Dependent Variable          | Independent Variable                  | R-squared | Adjusted R-squared | P-value          |
-|---------------------------------------------------------|----------------------|-----------------------------|---------------------------------------|-----------|--------------------|------------------|
-| Adult Homeless Pop. & Total Housing Proj. Prev 5 Yrs. (Logged) | Community District   | log(avg_homeless_count + 1) | log(housingsum + 1)                   | 0.2725    | 0.2676             | 4.54e-12         |
-| Adult Homeless Pop. & Total Recovered Syringe Count (Logged) | Community District   | log(total_syringe_ests + 1) | log(avg_homeless_count + 1)           | 0.1096    | 0.1037             | 2.914e-05       |
-| Adult Homeless Pop. & Total Housing Proj. Prev 5 Yrs. (Logged) | Borough              | log(avg_homeless_count + 1) | log(housingsum + 1)                   | 0.6862    | 0.6741             | 5.27e-08         |
-| Adult Homeless Pop. & Avg. YOY Pct. Chg. Housing Proj. Prev 5 Yrs. (Logged) | Borough              | log(avg_homeless_count + 1) | log(avg_yoy_change + 1)               | 0.1922    | 0.1497             | 0.04681         |
-| Adult Homeless Pop. & Total Recovered Syringe Count (Logged) | Borough              | log(total_syringes + 1)     | log(avg_homeless_count + 1)           | 0.2189    | 0.1889             | 0.01205         |
+| Regression Analysis                                      | Geography Level      | Dependent Variable          | Independent Variable                  | R-squared | Adjusted R-squared | P-value          | Correlation Type | Validity          |
+|---------------------------------------------------------|----------------------|-----------------------------|---------------------------------------|-----------|--------------------|------------------|------------------|-------------------|
+| Adult Homeless Pop. & Total Housing Proj. Prev 5 Yrs. (Logged) | Community District   | log(avg_homeless_count + 1) | log(housingsum + 1)                   | 0.2725    | 0.2676             | 4.54e-12         | Direct           | May not be valid|
+| Adult Homeless Pop. & Total Recovered Syringe Count (Logged) | Community District   | log(total_syringe_ests + 1) | log(avg_homeless_count + 1)           | 0.1096    | 0.1037             | 2.914e-05       | Direct           | Should be Valid|
+| Adult Homeless Pop. & Total Housing Proj. Prev 5 Yrs. (Logged) | Borough              | log(avg_homeless_count + 1) | log(housingsum + 1)                   | 0.6862    | 0.6741             | 5.27e-08         | Direct           | May not be valid|
+| Adult Homeless Pop. & Avg. YOY Pct. Chg. Housing Proj. Prev 5 Yrs. (Logged) | Borough              | log(avg_homeless_count + 1) | log(avg_yoy_change + 1)               | 0.1922    | 0.1497             | 0.04681         | Indirect         | May not be valid|
+| Adult Homeless Pop. & Total Recovered Syringe Count (Logged) | Borough              | log(total_syringes + 1)     | log(avg_homeless_count + 1)           | 0.2189    | 0.1889             | 0.01205         | Direct           | May not be valid|
+
 
 
 
@@ -1015,11 +1031,13 @@ Lastly, the direct relationship between the adult unhoused population and the nu
 
 #### Limitations of Analysis
 
-While conclusions can be drawn from this analysis there are several limitations that should be noted. The housing data used in this analysis is for housing-related completed construction projects, this data does not differentiate between high-end developments nor between construction projecs that adds housing units to the market, or other types of nuance. More granular housing data would be ideal for this type of regression analysis, such as total units added to market, total affordable housing units added to market, how many rent stabilized units were removed from the market through renovation loopholes, etc. 
+While conclusions can be drawn from this analysis there are several data limitations that should be noted. The housing data used in this analysis is for housing-related completed construction projects, this data does not differentiate between high-end developments nor between construction projecs that adds housing units to the market, or other types of nuance. More granular housing data would be ideal for this type of regression analysis, such as total units added to market, total affordable housing units added to market, how many rent stabilized units were removed from the market through renovation loopholes, etc. 
 
 Further limitations stem from the widely varying variables for each geographic boundary. While Community District variation and the geographic differences in the syringe collection data were accounted for by the aggregation up to the borough level, the variance between boroughs is not accounted for. Each of the boroughs zoning, parks land, and shelter presence varies widely. There was simply not enough years of data to analyze these variables at the city-level. 
 
-Lastly, the adult homeless population data used in this analysis orginated at counts from the shelter system. This does not take into account the unhoused population that makes no use of the shelter system, so there may be a large blind spot not considered in this analysis. 
+Additionally, the adult homeless population data used in this analysis orginated at counts from the shelter system. This does not take into account the unhoused population that makes no use of the shelter system, so there may be a large blind spot not considered in this analysis. 
+
+Lastly, several of the variables had floor effects on their distributions due to the nature of the variables. Log transformations were used, but there still were a large number of zero values for several of the variables examined. This analysis, other than logging the data, did not accomodate for this by removing outliers, weighing datapoints, or by other means. With this said, as shown by the model validitiy tests for linearity, some patterns are discernable. This may mean that these models are invalid and the conditions for linearity may not be met. The inclusion of these zero values and some outliers is another limitation of this analysios. Future work, should attempt to further clean and process the data so as to create more valid models.
 
 ## References
 
